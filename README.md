@@ -1,10 +1,6 @@
 # Block Finder
 
-Add description
-
-## Features
-
-Add feature list
+Adds a dashboard that select list of active Gutenberg blocks on a site and returns a list of pages, post and other post types where that block is being used.
 
 ## Installation
 
