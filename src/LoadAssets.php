@@ -10,12 +10,13 @@ class LoadAssets
     public function enqueueAdminAssets()
     {
         $script_path = 'build/block-finder.js';
-        $script_handle = 'block-finder';
+        $style_path = 'build/block-finder.css';
+        $asset_handle = 'block-finder';
         
-        wp_enqueue_script($script_handle . '-scripts', plugins_url( $script_path, __DIR__), [], null, true);
+        wp_enqueue_script($asset_handle . '-script', plugins_url( $script_path, __DIR__), [], false, true);
+        wp_enqueue_style($asset_handle . '-style', plugins_url( $style_path, __DIR__), [], false);
 
-        // Localize script for ajax
-        wp_localize_script($script_handle . '-scripts', 'blockFinderAjax', [
+        wp_localize_script($asset_handle . '-script', 'blockFinderAjax', [
             'ajax_url' => admin_url('admin-ajax.php'),
         ]);
     }

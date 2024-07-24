@@ -1,0 +1,12 @@
+#block_finder .postbox-header {
+  background-color: green;
+}
+
+#block_finder .postbox-header > * {
+  color: white;
+}
+
+#block-finder-form label {
+  display: block;
+  margin-bottom: 12px;
+}

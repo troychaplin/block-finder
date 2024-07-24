@@ -1,3 +1,5 @@
+import './styles.css';
+
 /* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', function () {
 	const form = document.getElementById('block-finder-form');
