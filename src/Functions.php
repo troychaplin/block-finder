@@ -76,45 +76,6 @@ class Functions
         echo '<div id="block-finder-results"></div>';
     }
 
-
-    // public function findBlockForm()
-    // {
-    //     // Get all registered blocks
-    //     $all_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
-
-    //     // Get post types that support the Gutenberg editor
-    //     $post_types = get_post_types(['public' => true], 'objects');
-    //     $gutenberg_post_types = array_filter($post_types, function ($post_type) {
-    //         return post_type_supports($post_type->name, 'editor');
-    //     });
-
-    //     echo '<form id="block-finder-form">';
-
-    //     // Add drop down of post types
-    //     echo '<label for="post-type-selector">Select a post type:</label>';
-    //     echo '<select id="post-type-selector" name="post_type">';
-    //     echo '<option value="">--Select--</option>';
-    //     foreach ($gutenberg_post_types as $post_type) {
-    //         echo '<option value="' . esc_attr($post_type->name) . '">' . esc_html($post_type->label) . '</option>';
-    //     }
-    //     echo '</select>';
-
-    //     // Add a drop down of blocks
-    //     echo '<label for="block-finder-selector">Select a block:</label>';
-    //     echo '<select id="block-finder-selector" name="block">';
-    //     echo '<option value="">--Select--</option>';
-    //     foreach ($all_blocks as $block_name => $block_type) {
-    //         if (!empty($block_type->title)) {
-    //             echo '<option value="' . esc_attr($block_name) . '">' . esc_html($block_type->title) . '</option>';
-    //         }
-    //     }
-    //     echo '</select>';
-
-    //     echo '<button type="submit" class="button button-primary">Find Block</button>';
-    //     echo '</form>';
-    //     echo '<div id="block-finder-results"></div>';
-    // }
-
     public function blockQuery()
     {
         if (!check_ajax_referer('block_finder_nonce', 'nonce', false)) {
@@ -171,7 +132,7 @@ class Functions
         if (!empty($found_elements)) {
             foreach ($found_elements as $category => $posts) {
                 $category_title = ucwords(str_replace('-', ' ', $category)) . ' Block';
-                echo '<h3>' . esc_html($category_title) . '</h3>';
+                echo '<h3>' . esc_html($category_title) . ' is used in the following:</h3>';
                 echo '<ul>' . implode('', $posts) . '</ul>';
             }
         } else {
