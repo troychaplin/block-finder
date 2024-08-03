@@ -14,6 +14,7 @@ Adds a dashboard that select list of active Gutenberg blocks on a site and retur
 -   Select your post type and block
 -   Click "Find Block"
 
+<img src="./assets/screenshot-1.png" alt="Image 2" width="60%"/>
 <img src="./assets/screenshot-2.png" alt="Image 2" width="60%"/>
 
 ## Getting Involved
