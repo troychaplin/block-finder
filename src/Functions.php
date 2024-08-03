@@ -6,14 +6,23 @@ use WP_Block_Type_Registry;
 
 class Functions
 {
+    protected $plugin_file;
+    protected $version;
+
+    public function __construct($plugin_file, $version)
+    {
+        $this->plugin_file = $plugin_file;
+        $this->version = $version;
+    }
+
     public function enqueueAdminAssets()
     {
         $script_path = 'build/block-finder.js';
         $style_path = 'build/block-finder.css';
         $asset_handle = 'block-finder';
 
-        wp_enqueue_script($asset_handle . '-script', plugins_url($script_path, __DIR__), [], false, true);
-        wp_enqueue_style($asset_handle . '-style', plugins_url($style_path, __DIR__), [], false);
+        wp_enqueue_script($asset_handle . '-script', plugins_url($script_path, $this->plugin_file), [], $this->version, true);
+        wp_enqueue_style($asset_handle . '-style', plugins_url($style_path, $this->plugin_file), [], $this->version);
 
         wp_localize_script($asset_handle . '-script', 'blockFinderAjax', [
             'ajax_url' => admin_url('admin-ajax.php'),
