@@ -1,37 +1,60 @@
-/* eslint-disable no-undef */
-document.addEventListener('DOMContentLoaded', function () {
+/* global blockFinderAjax */
+import './styles.css';
+
+document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('block-finder-form');
 
-	form.addEventListener('submit', function (e) {
+	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 
+		const postTypeSelector = document.getElementById('post-type-selector');
 		const blockSelector = document.getElementById('block-finder-selector');
+		const postType = postTypeSelector.value;
 		const block = blockSelector.value;
 		const resultsContainer = document.getElementById(
 			'block-finder-results'
 		);
+		const submitButton = form.querySelector('button[type="submit"]');
 
-		const xhr = new XMLHttpRequest();
-		xhr.open('POST', blockFinderAjax.ajax_url, true);
-		xhr.setRequestHeader(
-			'Content-Type',
-			'application/x-www-form-urlencoded; charset=UTF-8'
-		);
+		// Show loading indicator
+		submitButton.disabled = true;
+		submitButton.textContent = 'Finding blocks...';
+		resultsContainer.innerHTML = '<p>Loading results...</p>';
 
-		xhr.onload = function () {
-			if (xhr.status >= 200 && xhr.status < 400) {
-				resultsContainer.innerHTML = xhr.responseText;
-			} else {
-				resultsContainer.innerHTML =
-					'<p>An error occurred while processing the request.</p>';
-			}
-		};
-
-		xhr.onerror = function () {
+		if (postType === '' || block === '') {
 			resultsContainer.innerHTML =
-				'<p>An error occurred while processing the request.</p>';
-		};
+				'<p>Please select both a post type and a block to find.</p>';
+			return;
+		}
 
-		xhr.send('action=find_blocks&block=' + encodeURIComponent(block));
+		const data = new URLSearchParams();
+		data.append('action', 'find_blocks');
+		data.append('post_type', postType);
+		data.append('block', block);
+		data.append('nonce', blockFinderAjax.nonce);
+
+		try {
+			const response = await fetch(blockFinderAjax.ajax_url, {
+				method: 'POST',
+				headers: {
+					'Content-Type':
+						'application/x-www-form-urlencoded; charset=UTF-8',
+				},
+				body: data.toString(),
+			});
+
+			if (response.ok) {
+				const responseText = await response.text();
+				resultsContainer.innerHTML = responseText;
+			} else {
+				const errorData = await response.json();
+				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message}</p>`;
+			}
+		} catch (error) {
+			resultsContainer.innerHTML = `<p>An error occurred: ${error.message}</p>`;
+		} finally {
+			submitButton.disabled = false;
+			submitButton.textContent = 'Find Block';
+		}
 	});
 });
