@@ -6,14 +6,23 @@ use WP_Block_Type_Registry;
 
 class Functions
 {
+    protected $plugin_file;
+    protected $version;
+
+    public function __construct($plugin_file, $version)
+    {
+        $this->plugin_file = $plugin_file;
+        $this->version = $version;
+    }
+  
     public function enqueueAdminAssets()
     {
         $script_path = 'build/block-finder.js';
         $style_path = 'build/block-finder.css';
         $asset_handle = 'block-finder';
 
-        wp_enqueue_script($asset_handle . '-script', plugins_url($script_path, __DIR__), [], false, true);
-        wp_enqueue_style($asset_handle . '-style', plugins_url($style_path, __DIR__), [], false);
+        wp_enqueue_script($asset_handle . '-script', plugins_url($script_path, $this->plugin_file), [], $this->version, true);
+        wp_enqueue_style($asset_handle . '-style', plugins_url($style_path, $this->plugin_file), [], $this->version);
 
         wp_localize_script($asset_handle . '-script', 'blockFinderAjax', [
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -52,17 +61,17 @@ class Functions
         });
 
         echo '<form id="block-finder-form">';
-        echo '<label for="post-type-selector">Select a post type:</label>';
+        echo '<label for="post-type-selector">Select a post type you wish to search in</label>';
         echo '<select id="post-type-selector" name="post_type">';
-        echo '<option value="">Select a post type</option>'; // Default option
+        echo '<option value="">-- Select post type --</option>';
         foreach ($gutenberg_post_types as $post_type) {
             echo '<option value="' . esc_attr($post_type->name) . '">' . esc_html($post_type->label) . '</option>';
         }
         echo '</select>';
 
-        echo '<label for="block-finder-selector">Select a block to return a list of where it is being used on your site.</label>';
+        echo '<label for="block-finder-selector">Select a block you would like to search for</label>';
         echo '<select id="block-finder-selector" name="block">';
-        echo '<option value="">Select a block to find</option>'; // Default option
+        echo '<option value="">-- Select block --</option>';
         foreach ($inserter_blocks as $block_name => $block_type) {
             if (!empty($block_type->title)) {
                 echo '<option value="' . esc_attr($block_name) . '">' . esc_html($block_type->title) . '</option>';

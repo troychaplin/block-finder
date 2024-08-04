@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Show loading indicator
 		submitButton.disabled = true;
 		submitButton.textContent = 'Finding blocks...';
-		resultsContainer.innerHTML = '<p>Loading results...</p>';
+		resultsContainer.innerHTML =
+			'<p id="block-results-loading">Loading results...</p>';
 
 		if (postType === '' || block === '') {
 			resultsContainer.innerHTML =
