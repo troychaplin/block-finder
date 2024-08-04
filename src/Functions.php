@@ -14,7 +14,7 @@ class Functions
         $this->plugin_file = $plugin_file;
         $this->version = $version;
     }
-
+  
     public function enqueueAdminAssets()
     {
         $script_path = 'build/block-finder.js';
