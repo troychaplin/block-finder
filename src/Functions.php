@@ -14,9 +14,15 @@ class Functions
         $this->plugin_file = $plugin_file;
         $this->version = $version;
     }
-  
+
     public function enqueueAdminAssets()
     {
+        // Check if we are on the dashboard
+        $current_screen = get_current_screen();
+        if ($current_screen->base !== 'dashboard') {
+            return; // Exit if not on the dashboard
+        }
+
         $script_path = 'build/block-finder.js';
         $style_path = 'build/block-finder.css';
         $asset_handle = 'block-finder';
