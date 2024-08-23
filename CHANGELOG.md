@@ -7,17 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Prefix the change with one of these keywords:
 
-- _Added_: for new features.
-- _Changed_: for changes in existing functionality.
-- _Deprecated_: for soon-to-be removed features.
-- _Removed_: for now removed features.
-- _Fixed_: for any bug fixes.
-- _Security_: in case of vulnerabilities.
+-   _Added_: for new features.
+-   _Changed_: for changes in existing functionality.
+-   _Deprecated_: for soon-to-be removed features.
+-   _Removed_: for now removed features.
+-   _Fixed_: for any bug fixes.
+-   _Security_: in case of vulnerabilities.
 
 ## [Unreleased]
+
+## [1.0.1]
+
+### Fixed
+
+-   Scripts loading outside dashboard triggering a console error
+
+## [1.0.0]
+
+-   Initial release
 
 ## [0.1.0]
 
 ### Added
 
-- Base files for initial plugin setup
+-   Base files for initial plugin setup
