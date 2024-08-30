@@ -103,8 +103,9 @@ class Functions
             wp_die();
         }
 
-        $block = sanitize_text_field($_POST['block']);
-        $post_type = sanitize_text_field($_POST['post_type']);
+        $block = sanitize_text_field(wp_unslash($_POST['block']));
+        $post_type = sanitize_text_field(wp_unslash($_POST['post_type']));
+
         $block_name = str_replace('core/', '', $block);
         $patterns = [
             '/<!-- wp:' . preg_quote($block_name, '/') . '(.*?)-->/' => $block_name,
@@ -147,12 +148,13 @@ class Functions
         if (!empty($found_elements)) {
             foreach ($found_elements as $category => $posts) {
                 $category_title = esc_html(ucwords(str_replace('-', ' ', $category)) . ' Block');
-                echo '<h3>' . esc_html__($category_title . ' is used in the following:', 'block-finder') . '</h3>';
-                echo '<ul>' . implode('', $posts) . '</ul>';
+                echo '<h3>' . esc_html($category_title) . esc_html__(' is used in the following:', 'block-finder') . '</h3>';
+                echo '<ul>' . wp_kses_post(implode('', $posts)) . '</ul>';
             }
         } else {
             echo '<ul><li>' . esc_html__('No blocks found', 'block-finder') . '</li></ul>';
         }
+
 
         wp_die();
     }
