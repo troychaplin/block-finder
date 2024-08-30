@@ -31,14 +31,14 @@ class Functions
         wp_enqueue_style($asset_handle . '-style', plugins_url($style_path, $this->plugin_file), [], $this->version);
 
         wp_localize_script($asset_handle . '-script', 'blockFinderAjax', [
-            'ajax_url' => admin_url('admin-ajax.php'),
+            'ajax_url' => esc_url(admin_url('admin-ajax.php')),
             'nonce'    => wp_create_nonce('block_finder_nonce')
         ]);
     }
 
     public function blockFinderDashboard()
     {
-        add_meta_box('block_finder', 'Block Finder', [$this, 'findBlockForm'], 'dashboard', 'normal', 'default');
+        add_meta_box('block_finder', esc_html__('Block Finder', 'block-finder'), [$this, 'findBlockForm'], 'dashboard', 'normal', 'default');
     }
 
     public function findBlockForm()
@@ -67,17 +67,17 @@ class Functions
         });
 
         echo '<form id="block-finder-form">';
-        echo '<label for="post-type-selector">Select a post type you wish to search in</label>';
+        echo '<label for="post-type-selector">' . esc_html__('Select a post type you wish to search in', 'block-finder') . '</label>';
         echo '<select id="post-type-selector" name="post_type">';
-        echo '<option value="">-- Select post type --</option>';
+        echo '<option value="">' . esc_html__('-- Select post type --', 'block-finder') . '</option>';
         foreach ($gutenberg_post_types as $post_type) {
             echo '<option value="' . esc_attr($post_type->name) . '">' . esc_html($post_type->label) . '</option>';
         }
         echo '</select>';
 
-        echo '<label for="block-finder-selector">Select a block you would like to search for</label>';
+        echo '<label for="block-finder-selector">' . esc_html__('Select a block you would like to search for', 'block-finder') . '</label>';
         echo '<select id="block-finder-selector" name="block">';
-        echo '<option value="">-- Select block --</option>';
+        echo '<option value="">' . esc_html__('-- Select block --', 'block-finder') . '</option>';
         foreach ($inserter_blocks as $block_name => $block_type) {
             if (!empty($block_type->title)) {
                 echo '<option value="' . esc_attr($block_name) . '">' . esc_html($block_type->title) . '</option>';
@@ -86,7 +86,7 @@ class Functions
         echo '</select>';
 
         // Use WordPress button classes
-        echo '<button type="submit" class="button button-primary">Find Block</button>';
+        echo '<button type="submit" class="button button-primary">' . esc_html__('Find Block', 'block-finder') . '</button>';
         echo '</form>';
         echo '<div id="block-finder-results"></div>';
     }
@@ -94,12 +94,12 @@ class Functions
     public function blockQuery()
     {
         if (!check_ajax_referer('block_finder_nonce', 'nonce', false)) {
-            wp_send_json_error(['message' => 'Nonce verification failed.'], 400);
+            wp_send_json_error(['message' => esc_html__('Nonce verification failed.', 'block-finder')], 400);
             wp_die();
         }
 
         if (empty($_POST['block']) || empty($_POST['post_type'])) {
-            wp_send_json_error(['message' => 'Block and post type values are required.'], 400);
+            wp_send_json_error(['message' => esc_html__('Block and post type values are required.', 'block-finder')], 400);
             wp_die();
         }
 
@@ -120,7 +120,7 @@ class Functions
         $query = new \WP_Query($args);
 
         if (!$query->have_posts()) {
-            wp_send_json_error(['message' => 'No posts found for the selected post type.'], 404);
+            wp_send_json_error(['message' => esc_html__('No posts found for the selected post type.', 'block-finder')], 404);
         }
 
         while ($query->have_posts()) {
@@ -132,12 +132,12 @@ class Functions
             $edit_link = get_edit_post_link($post_id);
 
             if (!$post_title) {
-                $post_title = 'No title available';
+                $post_title = esc_html__('No title available', 'block-finder');
             }
 
             foreach ($patterns as $pattern => $category) {
                 if (preg_match($pattern, $content)) {
-                    $found_elements[$category][] = '<li>' . esc_html($post_title) . '<span><a href="' . esc_url($edit_link) . '">Edit</a><a href="' . esc_url($post_url) . '">View</a></span></li>';
+                    $found_elements[$category][] = '<li>' . esc_html($post_title) . '<span><a href="' . esc_url($edit_link) . '">' . esc_html__('Edit', 'block-finder') . '</a><a href="' . esc_url($post_url) . '">' . esc_html__('View', 'block-finder') . '</a></span></li>';
                 }
             }
         }
@@ -146,12 +146,12 @@ class Functions
 
         if (!empty($found_elements)) {
             foreach ($found_elements as $category => $posts) {
-                $category_title = ucwords(str_replace('-', ' ', $category)) . ' Block';
-                echo '<h3>' . esc_html($category_title) . ' is used in the following:</h3>';
+                $category_title = esc_html(ucwords(str_replace('-', ' ', $category)) . ' Block');
+                echo '<h3>' . esc_html__($category_title . ' is used in the following:', 'block-finder') . '</h3>';
                 echo '<ul>' . implode('', $posts) . '</ul>';
             }
         } else {
-            echo "<ul><li>No blocks found</li></ul>";
+            echo '<ul><li>' . esc_html__('No blocks found', 'block-finder') . '</li></ul>';
         }
 
         wp_die();
