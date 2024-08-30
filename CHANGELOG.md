@@ -16,6 +16,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.0.2]
+
 ### Added
 
 -   Missing composer.json file
