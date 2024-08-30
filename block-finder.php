@@ -14,8 +14,11 @@
  * @package           block-finder
  */
 
+// Exit if accessed directly
+if (! defined('ABSPATH')) exit;
+
 // Define plugin version
-define('BLOCK_FINDER_VERSION', '1.0.0');
+define('BLOCK_FINDER_VERSION', '1.0.1');
 
 // Setup autoloading
 require_once __DIR__ . '/vendor/autoload.php';

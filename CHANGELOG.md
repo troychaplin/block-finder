@@ -16,6 +16,22 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+-   Missing composer.json file
+
+### Changed
+
+-   Improved escaping of php
+
+### Fixed
+
+-   Stable tags out of sync, updated constant to match
+
+### Security
+
+-   Blocked direct access to primary php file
+
 ## [1.0.1]
 
 ### Fixed
