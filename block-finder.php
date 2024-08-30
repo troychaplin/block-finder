@@ -14,6 +14,9 @@
  * @package           block-finder
  */
 
+// Exit if accessed directly
+if (! defined('ABSPATH')) exit;
+
 // Define plugin version
 define('BLOCK_FINDER_VERSION', '1.0.1');
 
