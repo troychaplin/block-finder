@@ -16,6 +16,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Changed
+
+-   Readme text and other files related to publishing via SVN
+
 ## [1.0.2]
 
 ### Added
