@@ -12,7 +12,7 @@ A dashboard block search tool.
  
 == Description ==
  
-Adds a dashboard that select list of active Gutenberg blocks on a site and returns a list of pages, post and other post types where that block is being used.
+Adds a dashboard metabox that allows a user to quickly find and edit specific core or custom blocks across all post types on a site.
  
 == Installation ==
  
@@ -33,9 +33,39 @@ Adds a dashboard that select list of active Gutenberg blocks on a site and retur
 Simply deactivate and delete the plugin. 
  
 == Screenshots ==
-1. Description of the first screenshot.
-1. Description of the second screenshot. 
+1. Basic dashboard view on first load
+2. Filtering results by pages and core paragraph blocks
+3. Filtering results by all post types and core heading blocks
  
 == Changelog ==
 = 1.0 =
+* Plugin released.
+ 
+== Changelog ==
+= 1.0.2 =
+
+#### Added
+
+* Missing composer.json file
+
+#### Changed
+
+* Improved escaping of php
+
+#### Fixed
+
+* Stable tags out of sync, updated constant to match
+
+#### Security
+
+* Blocked direct access to primary php file
+
+= 1.0.1 =
+
+#### Fixed
+
+* Scripts loading outside dashboard triggering a console error
+
+= 1.0 =
+
 * Plugin released.
