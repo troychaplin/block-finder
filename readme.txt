@@ -4,11 +4,11 @@ Contributors: areziaal
 Tags: block, search, tools
 Requires at least: 6.3
 Tested up to: 6.6.1
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
  
-A dashboard block search tool.
+Easily find content blocks anywhere on your site.
  
 == Description ==
  
@@ -36,10 +36,6 @@ Simply deactivate and delete the plugin.
 1. Basic dashboard view on first load
 2. Filtering results by pages and core paragraph blocks
 3. Filtering results by all post types and core heading blocks
- 
-== Changelog ==
-= 1.0 =
-* Plugin released.
  
 == Changelog ==
 = 1.0.2 =
