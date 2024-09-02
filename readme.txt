@@ -38,6 +38,12 @@ Simply deactivate and delete the plugin.
 3. Filtering results by all post types and core heading blocks
  
 == Changelog ==
+= 1.0.3 =
+
+#### Changed
+
+* Files related to initial release via SVN
+
 = 1.0.2 =
 
 #### Added
