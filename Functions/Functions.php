@@ -70,6 +70,7 @@ class Functions
         echo '<label for="post-type-selector">' . esc_html__('Select a post type you wish to search in', 'block-finder') . '</label>';
         echo '<select id="post-type-selector" name="post_type">';
         echo '<option value="">' . esc_html__('-- Select post type --', 'block-finder') . '</option>';
+        echo '<option value="all">' . esc_html__('All Post Types', 'block-finder') . '</option>'; // Add this line
         foreach ($gutenberg_post_types as $post_type) {
             echo '<option value="' . esc_attr($post_type->name) . '">' . esc_html($post_type->label) . '</option>';
         }
@@ -112,11 +113,25 @@ class Functions
         ];
 
         $found_elements = [];
-        $args = [
-            'post_type' => [$post_type],
-            'nopaging' => true,
-            'posts_per_page' => -1,
-        ];
+
+        if ($post_type === 'all') {
+            $post_types = get_post_types(['public' => true], 'names');
+            $gutenberg_post_types = array_filter($post_types, function ($post_type_name) {
+                return post_type_supports($post_type_name, 'editor');
+            });
+
+            $args = [
+                'post_type' => array_values($gutenberg_post_types),
+                'nopaging' => true,
+                'posts_per_page' => -1,
+            ];
+        } else {
+            $args = [
+                'post_type' => [$post_type],
+                'nopaging' => true,
+                'posts_per_page' => -1,
+            ];
+        }
 
         $query = new \WP_Query($args);
 

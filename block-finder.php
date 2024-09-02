@@ -5,7 +5,7 @@
  * Description:       This plugin provides a dashboard to search for specific blocks
  * Requires at least: 6.3
  * Requires PHP:      7.0
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            Troy Chaplin
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -18,7 +18,7 @@
 if (! defined('ABSPATH')) exit;
 
 // Define plugin version
-define('BLOCK_FINDER_VERSION', '1.0.1');
+define('BLOCK_FINDER_VERSION', '1.0.2');
 
 // Setup autoloading
 require_once __DIR__ . '/vendor/autoload.php';
