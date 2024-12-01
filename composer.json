@@ -1,7 +1,10 @@
 {
 	"autoload": {
 		"psr-4": {
-			"BlockFinder\\": "Functions/"
+			"BlockFinder\\": "BlockFinder/"
 		}
+	},
+	"config": {
+		"autoloader-suffix": "BlockFinder"
 	}
 }

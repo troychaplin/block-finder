@@ -15,7 +15,7 @@ class Functions
         $this->version = $version;
     }
 
-    public function enqueueAdminAssets()
+    public function tc_block_finder_admin_assets()
     {
         // Check if we are on the dashboard
         $current_screen = get_current_screen();
@@ -36,12 +36,12 @@ class Functions
         ]);
     }
 
-    public function blockFinderDashboard()
+    public function tc_block_finder_dashboard()
     {
-        add_meta_box('block_finder', esc_html__('Block Finder', 'block-finder'), [$this, 'findBlockForm'], 'dashboard', 'normal', 'default');
+        add_meta_box('block_finder', esc_html__('Block Finder', 'block-finder'), [$this, 'tc_find_block_form'], 'dashboard', 'normal', 'default');
     }
 
-    public function findBlockForm()
+    public function tc_find_block_form()
     {
         $all_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
@@ -92,7 +92,7 @@ class Functions
         echo '<div id="block-finder-results"></div>';
     }
 
-    public function blockQuery()
+    public function tc_block_finder_query()
     {
         if (!check_ajax_referer('block_finder_nonce', 'nonce', false)) {
             wp_send_json_error(['message' => esc_html__('Nonce verification failed.', 'block-finder')], 400);

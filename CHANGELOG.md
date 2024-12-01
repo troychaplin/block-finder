@@ -18,6 +18,8 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+-   Changed function names to include better prefix
+-   Autoload suffix to avoid conflicts with other plugins
 -   Readme text and other files related to publishing via SVN
 
 ## [1.0.2]

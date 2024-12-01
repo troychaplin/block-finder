@@ -17,11 +17,11 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^19.4.1",
-		"@commitlint/config-conventional": "^19.4.1",
-		"@wordpress/env": "^10.6.0",
-		"@wordpress/prettier-config": "^4.6.0",
-		"@wordpress/scripts": "^28.6.0",
-		"husky": "^9.1.5"
+		"@commitlint/cli": "^19.6.0",
+		"@commitlint/config-conventional": "^19.6.0",
+		"@wordpress/env": "^10.13.0",
+		"@wordpress/prettier-config": "^4.13.0",
+		"@wordpress/scripts": "^30.6.0",
+		"husky": "^9.1.7"
 	}
 }
