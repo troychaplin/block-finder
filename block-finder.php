@@ -28,6 +28,6 @@ use BlockFinder\Functions;
 
 // Enqueue block editor assets
 $loadAssets = new Functions(__FILE__, BLOCK_FINDER_VERSION);
-add_action('admin_enqueue_scripts', [$loadAssets, 'enqueueAdminAssets']);
-add_action('wp_dashboard_setup', [$loadAssets, 'blockFinderDashboard']);
-add_action('wp_ajax_find_blocks', [$loadAssets, 'blockQuery']);
+add_action('admin_enqueue_scripts', [$loadAssets, 'tc_block_finder_admin_assets']);
+add_action('wp_dashboard_setup', [$loadAssets, 'tc_block_finder_dashboard']);
+add_action('wp_ajax_find_blocks', [$loadAssets, 'tc_block_finder_query']);

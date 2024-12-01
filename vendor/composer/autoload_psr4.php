@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'BlockFinder\\' => array($baseDir . '/Functions'),
+    'BlockFinder\\' => array($baseDir . '/BlockFinder'),
 );
