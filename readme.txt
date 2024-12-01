@@ -4,7 +4,7 @@ Contributors: areziaal
 Tags: block, search, tools
 Requires at least: 6.3
 Tested up to: 6.6.1
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
  
@@ -38,6 +38,13 @@ Simply deactivate and delete the plugin.
 3. Filtering results by all post types and core heading blocks
  
 == Changelog ==
+= 1.0.4 =
+
+#### Changed
+
+* Changed function names to include better prefix
+* Autoload suffix to avoid conflicts with other plugins
+
 = 1.0.3 =
 
 #### Changed

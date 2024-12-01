@@ -14,12 +14,13 @@ Prefix the change with one of these keywords:
 -   _Fixed_: for any bug fixes.
 -   _Security_: in case of vulnerabilities.
 
-## [Unreleased]
-
-### Changed
+## [1.0.4]
 
 -   Changed function names to include better prefix
 -   Autoload suffix to avoid conflicts with other plugins
+
+## [1.0.3]
+
 -   Readme text and other files related to publishing via SVN
 
 ## [1.0.2]
