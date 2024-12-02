@@ -16,10 +16,14 @@ Prefix the change with one of these keywords:
 
 ## [1.0.4]
 
+### Changed
+
 -   Changed function names to include better prefix
 -   Autoload suffix to avoid conflicts with other plugins
 
 ## [1.0.3]
+
+### Changed
 
 -   Readme text and other files related to publishing via SVN
 
