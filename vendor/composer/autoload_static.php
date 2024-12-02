@@ -16,7 +16,7 @@ class ComposerStaticInitBlockFinder
     public static $prefixDirsPsr4 = array (
         'BlockFinder\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/BlockFinder',
+            0 => __DIR__ . '/../..' . '/Functions',
         ),
     );
 
