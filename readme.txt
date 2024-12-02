@@ -38,6 +38,12 @@ Simply deactivate and delete the plugin.
 3. Filtering results by all post types and core heading blocks
  
 == Changelog ==
+= 1.0.5 =
+
+### Changed
+
+-   Tested up to 6.7.1
+
 = 1.0.4 =
 
 #### Changed

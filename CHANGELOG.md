@@ -14,6 +14,12 @@ Prefix the change with one of these keywords:
 -   _Fixed_: for any bug fixes.
 -   _Security_: in case of vulnerabilities.
 
+## [1.0.5]
+
+### Changed
+
+-   Tested up to 6.7.1
+
 ## [1.0.4]
 
 ### Changed
