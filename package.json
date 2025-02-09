@@ -14,14 +14,19 @@
 		"clean": "rm -rf node_modules ; rm package-lock.json ; npm install",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip",
-		"prepare": "husky"
+		"prepare": "husky",
+		"wp-env": "wp-env",
+		"wp-env:start": "wp-env start",
+		"wp-env:stop": "wp-env stop",
+		"wp-env:destroy": "wp-env destroy",
+		"wp-env:clean": "wp-env clean all"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^19.6.0",
-		"@commitlint/config-conventional": "^19.6.0",
-		"@wordpress/env": "^10.13.0",
-		"@wordpress/prettier-config": "^4.13.0",
-		"@wordpress/scripts": "^30.6.0",
-		"husky": "^9.1.7"
+		"@commitlint/cli": "^19.2.1",
+		"@commitlint/config-conventional": "^19.1.0",
+		"@wordpress/env": "^9.6.0",
+		"@wordpress/prettier-config": "^3.11.0",
+		"@wordpress/scripts": "^27.5.0",
+		"husky": "^9.0.11"
 	}
 }
