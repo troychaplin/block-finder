@@ -1,6 +1,6 @@
 {
 	"name": "block-finder",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Add block checks in the editor to support publishing accessible content",
 	"author": "Troy Chaplin",
 	"license": "GPL-2.0-or-later",
@@ -17,9 +17,9 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@wordpress/env": "^10.26.0",
-		"@wordpress/prettier-config": "^4.26.0",
-		"@wordpress/scripts": "^30.19.0",
+		"@wordpress/env": "^10.35.0",
+		"@wordpress/prettier-config": "^4.35.0",
+		"@wordpress/scripts": "^31.0.0",
 		"husky": "^9.1.7"
 	}
 }
