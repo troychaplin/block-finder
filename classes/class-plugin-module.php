@@ -2,10 +2,10 @@
 /**
  * Base class for plugin modules which can be initialized.
  *
- * @package BlockFinder
+ * @package Block_Finder
  */
 
-namespace BlockFinder;
+namespace Block_Finder;
 
 /**
  * Plugin module extended by other classes.

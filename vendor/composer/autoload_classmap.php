@@ -6,10 +6,10 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'BlockFinder\\Dashboard' => $baseDir . '/classes/class-dashboard.php',
-    'BlockFinder\\Enqueues' => $baseDir . '/classes/class-enqueues.php',
-    'BlockFinder\\Plugin_Module' => $baseDir . '/classes/class-plugin-module.php',
-    'BlockFinder\\Plugin_Paths' => $baseDir . '/classes/class-plugin-paths.php',
+    'Block_Finder\\Dashboard' => $baseDir . '/classes/class-dashboard.php',
+    'Block_Finder\\Enqueues' => $baseDir . '/classes/class-enqueues.php',
+    'Block_Finder\\Plugin_Module' => $baseDir . '/classes/class-plugin-module.php',
+    'Block_Finder\\Plugin_Paths' => $baseDir . '/classes/class-plugin-paths.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'PHPCSUtils\\AbstractSniffs\\AbstractArrayDeclarationSniff' => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/AbstractSniffs/AbstractArrayDeclarationSniff.php',
     'PHPCSUtils\\BackCompat\\BCFile' => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/BackCompat/BCFile.php',

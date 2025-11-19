@@ -2,17 +2,17 @@
 /**
  * Enqueue assets.
  *
- * @package BlockFinder
+ * @package Block_Finder
  */
 
-namespace BlockFinder;
+namespace Block_Finder;
 
 /**
  * Class Enqueues
  *
  * This class is responsible for enqueueing scripts and styles for the plugin.
  *
- * @package BlockFinder
+ * @package Block_Finder
  */
 class Enqueues extends Plugin_Module {
 	/**
@@ -35,17 +35,17 @@ class Enqueues extends Plugin_Module {
 	 * Initialize the module.
 	 */
 	public function init() {
-        add_action( 'admin_enqueue_scripts', array( $this, 'tc_block_finder_admin_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'tc_block_finder_admin_assets' ) );
 	}
 
 	/**
 	 * Enqueues the admin assets
 	 */
 	public function tc_block_finder_admin_assets() {
-        $current_screen = get_current_screen();
-        if ($current_screen->base !== 'dashboard') {
-            return;
-        }
+		$current_screen = get_current_screen();
+		if ( $current_screen->base !== 'dashboard' ) {
+			return;
+		}
 
 		$asset_meta = $this->build_dir->get_asset_meta( 'block-finder.js' );
 
@@ -66,10 +66,14 @@ class Enqueues extends Plugin_Module {
 				false
 			);
 
-            wp_localize_script('block-finder-js', 'blockFinderAjax', [
-                'ajax_url' => esc_url(admin_url('admin-ajax.php')),
-                'nonce'    => wp_create_nonce('block_finder_nonce')
-            ]);
+			wp_localize_script(
+				'block-finder-js',
+				'blockFinderAjax',
+				array(
+					'ajax_url' => esc_url( admin_url( 'admin-ajax.php' ) ),
+					'nonce'    => wp_create_nonce( 'block_finder_nonce' ),
+				)
+			);
 		}
 	}
 }

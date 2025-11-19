@@ -21,10 +21,10 @@ class ComposerStaticInitbe4768179afec99e6e27eb5d01bc7e98
     );
 
     public static $classMap = array (
-        'BlockFinder\\Dashboard' => __DIR__ . '/../..' . '/classes/class-dashboard.php',
-        'BlockFinder\\Enqueues' => __DIR__ . '/../..' . '/classes/class-enqueues.php',
-        'BlockFinder\\Plugin_Module' => __DIR__ . '/../..' . '/classes/class-plugin-module.php',
-        'BlockFinder\\Plugin_Paths' => __DIR__ . '/../..' . '/classes/class-plugin-paths.php',
+        'Block_Finder\\Dashboard' => __DIR__ . '/../..' . '/classes/class-dashboard.php',
+        'Block_Finder\\Enqueues' => __DIR__ . '/../..' . '/classes/class-enqueues.php',
+        'Block_Finder\\Plugin_Module' => __DIR__ . '/../..' . '/classes/class-plugin-module.php',
+        'Block_Finder\\Plugin_Paths' => __DIR__ . '/../..' . '/classes/class-plugin-paths.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'PHPCSUtils\\AbstractSniffs\\AbstractArrayDeclarationSniff' => __DIR__ . '/..' . '/phpcsstandards/phpcsutils/PHPCSUtils/AbstractSniffs/AbstractArrayDeclarationSniff.php',
         'PHPCSUtils\\BackCompat\\BCFile' => __DIR__ . '/..' . '/phpcsstandards/phpcsutils/PHPCSUtils/BackCompat/BCFile.php',

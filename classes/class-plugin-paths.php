@@ -2,17 +2,17 @@
 /**
  * Resolve paths and URLs relative to plugin directories.
  *
- * @package BlockFinder
+ * @package Block_Finder
  */
 
-namespace BlockFinder;
+namespace Block_Finder;
 
 /**
  * Class Plugin_Paths
  *
  * This class provides methods to handle and retrieve various paths related to the plugin.
  *
- * @package BlockFinder
+ * @package Block_Finder
  */
 class Plugin_Paths {
 
