@@ -38,49 +38,5 @@ Simply deactivate and delete the plugin.
 3. Filtering results by all post types and core heading blocks
  
 == Changelog ==
-= 1.0.5 =
 
-### Changed
-
--   Tested up to 6.7.1
-
-= 1.0.4 =
-
-#### Changed
-
-* Changed function names to include better prefix
-* Autoload suffix to avoid conflicts with other plugins
-
-= 1.0.3 =
-
-#### Changed
-
-* Files related to initial release via SVN
-
-= 1.0.2 =
-
-#### Added
-
-* Missing composer.json file
-
-#### Changed
-
-* Improved escaping of php
-
-#### Fixed
-
-* Stable tags out of sync, updated constant to match
-
-#### Security
-
-* Blocked direct access to primary php file
-
-= 1.0.1 =
-
-#### Fixed
-
-* Scripts loading outside dashboard triggering a console error
-
-= 1.0 =
-
-* Plugin released.
+View the <a href="https://github.com/troychaplin/block-finder/blob/main/CHANGELOG.md">changelog</a> in the Github repo.
