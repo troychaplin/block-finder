@@ -21,14 +21,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Define plugin version
 define('BLOCK_FINDER_VERSION', '1.0.6');
 
-// Setup autoloading
-require_once __DIR__ . '/vendor/autoload.php';
+// Include our bundled autoload if not loaded globally.
+if ( ! class_exists( BlockFinder\Plugin_Paths::class ) && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
 
-// Include dependencies
-use BlockFinder\Functions;
+if ( ! class_exists( BlockFinder\Plugin_Paths::class ) ) {
+	wp_trigger_error( 'Block Finder: Composer autoload file not found. Please run `composer install`.', E_USER_ERROR );
+	return;
+}
 
-// Enqueue block editor assets
-$loadAssets = new Functions(__FILE__, BLOCK_FINDER_VERSION);
-add_action('admin_enqueue_scripts', [$loadAssets, 'tc_block_finder_admin_assets']);
-add_action('wp_dashboard_setup', [$loadAssets, 'tc_block_finder_dashboard']);
-add_action('wp_ajax_find_blocks', [$loadAssets, 'tc_block_finder_query']);
+// Instantiate our modules.
+$block_finder_modules = array(
+	new BlockFinder\Enqueues( __DIR__ . '/build' ),
+	new BlockFinder\Dashboard( __DIR__ . '/build' ),
+);
+
+foreach ( $block_finder_modules as $block_finder_module ) {
+	if ( is_a( $block_finder_module, BlockFinder\Plugin_Module::class ) ) {
+		$block_finder_module->init();
+	}
+}

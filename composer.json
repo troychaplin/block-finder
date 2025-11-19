@@ -1,10 +1,23 @@
 {
+	"name": "troychaplin/block-finder",
+	"description": "This plugin provides a dashboard to search for specific blocks.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
 	"autoload": {
-		"psr-4": {
-			"BlockFinder\\": "Functions/"
-		}
+		"classmap": [
+			"classes/"
+		]
+	},
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^3.2"
 	},
 	"config": {
-		"autoloader-suffix": "BlockFinder"
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"format": "phpcbf",
+		"lint": "phpcs"
 	}
 }
