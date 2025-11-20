@@ -1,3 +1,5 @@
+<img src="assets/banner-772x250.png" alt="Block Finder Plugin Banner" style="width: 100%; height: auto;">
+
 # Block Finder
 
 Adds a dashboard that select list of active Gutenberg blocks on a site and returns a list of pages, post and other post types where that block is being used.
