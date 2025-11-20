@@ -14,6 +14,17 @@ Prefix the change with one of these keywords:
 -   _Fixed_: for any bug fixes.
 -   _Security_: in case of vulnerabilities.
 
+## [Unreleased]
+
+## [1.0.6]
+
+### Added
+
+-   Searchable autocomplete dropdowns for post type and block selectors
+-   Type-to-search functionality with real-time filtering
+-   Keyboard navigation support (arrow keys, enter, escape) for dropdown options
+-   Visual improvements including spacing between input and dropdown menu
+
 ## [1.0.5]
 
 ### Changed
