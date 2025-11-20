@@ -1,5 +1,5 @@
 /* global blockFinderAjax */
-import './styles.css';
+import './styles.scss';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('block-finder-form');
