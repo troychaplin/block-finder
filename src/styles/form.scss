@@ -211,28 +211,44 @@
 // Filter buttons
 .block-finder-filters {
 	display: flex;
+	align-items: center;
 	gap: 8px;
 	padding: 12px;
 	background-color: #fff;
 	border-bottom: 1px solid #c3c4c7;
 }
 
-.block-finder-filter {
-	font-size: 12px;
-	padding: 4px 12px;
+.block-finder-filter-btn {
+	padding: 6px 12px;
+	font-size: 13px;
+	line-height: 1.4;
+	border: 1px solid #c3c4c7;
 	border-radius: 3px;
+	background-color: #f6f7f7;
+	color: #2c3338;
 	cursor: pointer;
-	transition: background-color 0.15s ease, border-color 0.15s ease;
+	transition: background-color 0.1s ease, border-color 0.1s ease;
+
+	&:hover {
+		background-color: #f0f0f1;
+		border-color: #8c8f94;
+	}
+
+	&:focus {
+		outline: none;
+		border-color: #2271b1;
+		box-shadow: 0 0 0 1px #2271b1;
+	}
 
 	&.active {
 		background-color: #2271b1;
 		border-color: #2271b1;
 		color: #fff;
-	}
 
-	&:hover:not(.active) {
-		background-color: #f0f0f1;
-		border-color: #8c8f94;
+		&:hover {
+			background-color: #135e96;
+			border-color: #135e96;
+		}
 	}
 }
 

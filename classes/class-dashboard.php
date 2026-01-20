@@ -166,13 +166,14 @@ class Dashboard extends Plugin_Module {
 		$block     = sanitize_text_field( wp_unslash( $_POST['block'] ) );
 		$post_type = sanitize_text_field( wp_unslash( $_POST['post_type'] ) );
 		$page      = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 1;
+		$filter    = isset( $_POST['filter'] ) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : 'all';
 
 		// Check for cached results.
 		$cache_key = $this->tc_block_finder_get_cache_key( $block, $post_type );
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
-			$this->tc_block_finder_render_results( $cached, $block, $page );
+			$this->tc_block_finder_render_results( $cached, $block, $page, $filter );
 			wp_die();
 		}
 
@@ -201,7 +202,7 @@ class Dashboard extends Plugin_Module {
 		set_transient( $cache_key, $results, self::CACHE_EXPIRATION );
 
 		// Render paginated results.
-		$this->tc_block_finder_render_results( $results, $block, $page );
+		$this->tc_block_finder_render_results( $results, $block, $page, $filter );
 
 		wp_die();
 	}
@@ -356,11 +357,47 @@ class Dashboard extends Plugin_Module {
 	 * @param array  $results The array of post results.
 	 * @param string $block   The block name that was searched for.
 	 * @param int    $page    The current page number.
+	 * @param string $filter  The filter type: 'all', 'root', or 'nested'.
 	 * @return void
 	 */
-	private function tc_block_finder_render_results( $results, $block, $page ) {
+	private function tc_block_finder_render_results( $results, $block, $page, $filter = 'all' ) {
+		// Store original count before filtering.
+		$all_count = count( $results );
+
+		// Count posts with nested instances.
+		$nested_count = 0;
+		foreach ( $results as $result ) {
+			if ( ! empty( $result['block_instances'] ) ) {
+				foreach ( $result['block_instances'] as $instance ) {
+					if ( ! $instance['is_root'] ) {
+						++$nested_count;
+						break; // Only count once per post.
+					}
+				}
+			}
+		}
+
+		// Apply filter to results.
+		if ( 'nested' === $filter ) {
+			$results = array_filter(
+				$results,
+				function ( $result ) {
+					if ( empty( $result['block_instances'] ) ) {
+						return false;
+					}
+					foreach ( $result['block_instances'] as $instance ) {
+						if ( ! $instance['is_root'] ) {
+							return true;
+						}
+					}
+					return false;
+				}
+			);
+			$results = array_values( $results ); // Re-index array.
+		}
+
 		$total_results = count( $results );
-		$total_pages   = ceil( $total_results / self::RESULTS_PER_PAGE );
+		$total_pages   = max( 1, ceil( $total_results / self::RESULTS_PER_PAGE ) );
 		$page          = max( 1, min( $page, $total_pages ) );
 		$offset        = ( $page - 1 ) * self::RESULTS_PER_PAGE;
 
@@ -371,48 +408,21 @@ class Dashboard extends Plugin_Module {
 		$block_name     = str_replace( 'core/', '', $block );
 		$category_title = ucwords( str_replace( '-', ' ', $block_name ) ) . ' Block';
 
-		// Count posts with root vs nested instances (not instance counts).
-		$root_post_count   = 0;
-		$nested_post_count = 0;
-		foreach ( $results as $result ) {
-			$has_root   = false;
-			$has_nested = false;
-			if ( ! empty( $result['block_instances'] ) ) {
-				foreach ( $result['block_instances'] as $instance ) {
-					if ( $instance['is_root'] ) {
-						$has_root = true;
-					} else {
-						$has_nested = true;
-					}
-				}
-			}
-			if ( $has_root ) {
-				++$root_post_count;
-			}
-			if ( $has_nested ) {
-				++$nested_post_count;
-			}
-		}
-
 		// Results header with count.
 		echo '<h3>' . esc_html( $category_title ) . esc_html__( ' is used in the following:', 'block-finder' );
 		echo ' <span class="block-finder-count">(' . esc_html( $total_results ) . ' ' . esc_html( _n( 'post', 'posts', $total_results, 'block-finder' ) ) . ')</span>';
 		echo '</h3>';
 
-		// Filter buttons (only show if there are both root and nested posts).
-		if ( $root_post_count > 0 && $nested_post_count > 0 ) {
+		// Filter buttons (only show if there are posts with nested blocks).
+		if ( $nested_count > 0 ) {
 			echo '<div class="block-finder-filters">';
-			echo '<button type="button" class="button block-finder-filter active" data-filter="all">';
+			echo '<button type="button" class="block-finder-filter-btn' . ( 'all' === $filter ? ' active' : '' ) . '" data-filter="all">';
 			/* translators: %d: total number of posts */
-			echo esc_html( sprintf( __( 'All (%d)', 'block-finder' ), $total_results ) );
+			echo esc_html( sprintf( __( 'All Blocks (%d)', 'block-finder' ), $all_count ) );
 			echo '</button>';
-			echo '<button type="button" class="button block-finder-filter" data-filter="root">';
-			/* translators: %d: number of posts with parent blocks */
-			echo esc_html( sprintf( __( 'Parent Block (%d)', 'block-finder' ), $root_post_count ) );
-			echo '</button>';
-			echo '<button type="button" class="button block-finder-filter" data-filter="nested">';
+			echo '<button type="button" class="block-finder-filter-btn' . ( 'nested' === $filter ? ' active' : '' ) . '" data-filter="nested">';
 			/* translators: %d: number of posts with inner blocks */
-			echo esc_html( sprintf( __( 'InnerBlock (%d)', 'block-finder' ), $nested_post_count ) );
+			echo esc_html( sprintf( __( 'InnerBlocks (%d)', 'block-finder' ), $nested_count ) );
 			echo '</button>';
 			echo '</div>';
 		}
@@ -446,7 +456,7 @@ class Dashboard extends Plugin_Module {
 			echo '<div class="block-finder-result-content">';
 			echo '<span class="block-finder-result-title">' . esc_html( $result['title'] ) . '</span>';
 
-			// Show context indicators for nested blocks only.
+			// Show context indicators for nested blocks.
 			if ( ! empty( $result['block_instances'] ) ) {
 				$nested_parents = array();
 				foreach ( $result['block_instances'] as $instance ) {

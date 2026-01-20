@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
 	...defaultConfig,
 	entry: {
-		'block-finder': [path.resolve(__dirname, 'src/script.js')],
+		'block-finder': [path.resolve(__dirname, 'src/script.ts')],
 	},
 	output: {
 		path: path.resolve(__dirname, 'build'),
