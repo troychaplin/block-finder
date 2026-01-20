@@ -6,58 +6,58 @@ This document outlines planned improvements for the Block Finder plugin.
 
 ## Performance Improvements
 
-### 1. Add Result Caching
+### ~~1. Add Result Caching~~ ✅
 
-**Problem:** Every search scans all posts, even for repeated identical queries.
+~~**Problem:** Every search scans all posts, even for repeated identical queries.~~
 
-**Solution:**
+~~**Solution:**~~
 
-- Implement transient-based caching for search results
-- Cache key based on hash of block name + post type
-- Set reasonable expiration (e.g., 1 hour)
-- Invalidate cache on post save/update/delete via `save_post` hook
-- Add option to force refresh/bypass cache
+- ~~Implement transient-based caching for search results~~
+- ~~Cache key based on hash of block name + post type~~
+- ~~Set reasonable expiration (e.g., 1 hour)~~
+- ~~Invalidate cache on post save/update/delete via `save_post` hook~~
+- ~~Add option to force refresh/bypass cache~~
 
-**Files affected:**
+~~**Files affected:**~~
 
-- `classes/class-dashboard.php`
-
----
-
-### 2. Paginate Results
-
-**Problem:** Using `nopaging=true` loads all posts into memory, which can cause performance issues on large sites.
-
-**Solution:**
-
-- Add pagination to search results
-- Limit initial results (e.g., 20 per page)
-- Add "Load More" button or pagination controls
-- Update AJAX handler to accept page/offset parameter
-- Display total count of matching posts
-
-**Files affected:**
-
-- `classes/class-dashboard.php`
-- `src/scripts/form.js`
-- `src/styles.scss`
+- ~~`classes/class-dashboard.php`~~
 
 ---
 
-### 3. Database-Level Search
+### ~~2. Paginate Results~~ ✅
 
-**Problem:** Current implementation loads all posts then regex matches in PHP, which is inefficient.
+~~**Problem:** Using `nopaging=true` loads all posts into memory, which can cause performance issues on large sites.~~
 
-**Solution:**
+~~**Solution:**~~
 
-- Use `$wpdb` direct query with `LIKE '%<!-- wp:blockname%'` in WHERE clause
-- Move filtering to database level instead of PHP memory
-- Combine with pagination for optimal performance
-- Consider adding database index recommendations for large sites
+- ~~Add pagination to search results~~
+- ~~Limit initial results (e.g., 20 per page)~~
+- ~~Add "Load More" button or pagination controls~~
+- ~~Update AJAX handler to accept page/offset parameter~~
+- ~~Display total count of matching posts~~
 
-**Files affected:**
+~~**Files affected:**~~
 
-- `classes/class-dashboard.php`
+- ~~`classes/class-dashboard.php`~~
+- ~~`src/scripts/form.js`~~
+- ~~`src/styles.scss`~~
+
+---
+
+### ~~3. Database-Level Search~~ ✅
+
+~~**Problem:** Current implementation loads all posts then regex matches in PHP, which is inefficient.~~
+
+~~**Solution:**~~
+
+- ~~Use `$wpdb` direct query with `LIKE '%<!-- wp:blockname%'` in WHERE clause~~
+- ~~Move filtering to database level instead of PHP memory~~
+- ~~Combine with pagination for optimal performance~~
+- ~~Consider adding database index recommendations for large sites~~
+
+~~**Files affected:**~~
+
+- ~~`classes/class-dashboard.php`~~
 
 ---
 
@@ -176,18 +176,18 @@ This document outlines planned improvements for the Block Finder plugin.
 
 ## Code Quality
 
-### 14. Fix class-dashboard.php Header
+### ~~14. Fix class-dashboard.php Header~~ ✅
 
-**Problem:** File header comment incorrectly says "Class Enqueues" instead of "Class Dashboard".
+~~**Problem:** File header comment incorrectly says "Class Enqueues" instead of "Class Dashboard".~~
 
-**Solution:**
+~~**Solution:**~~
 
-- Update the DocBlock header to correctly identify the class
-- Review other files for similar inconsistencies
+- ~~Update the DocBlock header to correctly identify the class~~
+- ~~Review other files for similar inconsistencies~~
 
-**Files affected:**
+~~**Files affected:**~~
 
-- `classes/class-dashboard.php`
+- ~~`classes/class-dashboard.php`~~
 
 ---
 
@@ -246,13 +246,13 @@ This document outlines planned improvements for the Block Finder plugin.
 Suggested order based on dependencies and impact:
 
 1. **Phase 1 - Foundation**
-   - [ ] 14. Fix class-dashboard.php header (quick win)
-   - [ ] 3. Database-level search (foundation for performance)
+   - [x] 14. Fix class-dashboard.php header (quick win)
+   - [x] 3. Database-level search (foundation for performance)
    - [ ] 8. Nested/inner block detection (improves accuracy)
 
 2. **Phase 2 - Performance**
-   - [ ] 1. Add result caching
-   - [ ] 2. Paginate results
+   - [x] 1. Add result caching
+   - [x] 2. Paginate results
    - [ ] 5. Show block count per post
 
 3. **Phase 3 - UX Polish**

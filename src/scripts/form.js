@@ -212,35 +212,39 @@ document.addEventListener('DOMContentLoaded', () => {
 		makeAutocomplete(blockSelector, 'Search blocks...');
 	}
 
-	form.addEventListener('submit', async e => {
-		e.preventDefault();
-
+	/**
+	 * Performs the block search AJAX request.
+	 *
+	 * @param {number} page The page number to fetch.
+	 */
+	async function performSearch(page = 1) {
 		if (!postTypeSelector || !blockSelector) {
 			return;
 		}
 
 		const postType = postTypeSelector.value;
 		const block = blockSelector.value;
+
+		if (postType === '' || block === '') {
+			const resultsContainer = document.getElementById('block-finder-results');
+			resultsContainer.innerHTML =
+				'<p>Please select both a post type and a block to find.</p>';
+			return;
+		}
+
 		const resultsContainer = document.getElementById('block-finder-results');
 		const submitButton = form.querySelector('button[type="submit"]');
 
-		// Show loading indicator
+		// Show loading indicator.
 		submitButton.disabled = true;
 		submitButton.textContent = 'Finding blocks...';
 		resultsContainer.innerHTML = '<p id="block-results-loading">Loading results...</p>';
-
-		if (postType === '' || block === '') {
-			resultsContainer.innerHTML =
-				'<p>Please select both a post type and a block to find.</p>';
-			submitButton.disabled = false;
-			submitButton.textContent = 'Find Block';
-			return;
-		}
 
 		const data = new URLSearchParams();
 		data.append('action', 'find_blocks');
 		data.append('post_type', postType);
 		data.append('block', block);
+		data.append('page', page.toString());
 		data.append('nonce', blockFinderAjax.nonce);
 
 		try {
@@ -255,6 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (response.ok) {
 				const responseText = await response.text();
 				resultsContainer.innerHTML = responseText;
+
+				// Attach pagination event listeners.
+				attachPaginationListeners();
 			} else {
 				const errorData = await response.json();
 				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message}</p>`;
@@ -265,5 +272,33 @@ document.addEventListener('DOMContentLoaded', () => {
 			submitButton.disabled = false;
 			submitButton.textContent = 'Find Block';
 		}
+	}
+
+	/**
+	 * Attaches click event listeners to pagination buttons.
+	 */
+	function attachPaginationListeners() {
+		const resultsContainer = document.getElementById('block-finder-results');
+		const prevButton = resultsContainer.querySelector('.block-finder-prev');
+		const nextButton = resultsContainer.querySelector('.block-finder-next');
+
+		if (prevButton) {
+			prevButton.addEventListener('click', () => {
+				const page = parseInt(prevButton.dataset.page, 10);
+				performSearch(page);
+			});
+		}
+
+		if (nextButton) {
+			nextButton.addEventListener('click', () => {
+				const page = parseInt(nextButton.dataset.page, 10);
+				performSearch(page);
+			});
+		}
+	}
+
+	form.addEventListener('submit', async e => {
+		e.preventDefault();
+		performSearch(1);
 	});
 });

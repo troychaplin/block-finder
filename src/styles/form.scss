@@ -1,3 +1,16 @@
+// Override WordPress dashboard overflow to allow dropdowns to extend
+#dashboard-widgets-wrap {
+	overflow: visible;
+}
+
+#block_finder {
+	overflow: visible;
+
+	.inside {
+		overflow: visible;
+	}
+}
+
 #block-finder-form label {
 	padding-bottom: 16px;
 }
@@ -47,17 +60,17 @@
 	top: 100%;
 	left: 0;
 	right: 0;
-	margin-top: 10px;
+	margin-top: 4px;
 	background-color: #fff;
 	border: 1px solid #8c8f94;
 	border-radius: 5px;
-	max-height: 300px;
+	max-height: 200px;
 	overflow-y: auto;
 	padding: 0;
 	list-style: none;
-	z-index: 1000;
+	z-index: 100000;
 	display: none;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 
 	&.show {
 		display: block;
@@ -149,4 +162,36 @@
 
 #block-finder-results a:hover {
 	text-decoration: underline;
+}
+
+// Results count badge
+.block-finder-count {
+	font-weight: 400;
+	color: #646970;
+	font-size: 13px;
+}
+
+// Pagination styles
+.block-finder-pagination {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	background-color: #fff;
+	border-top: 1px solid #c3c4c7;
+}
+
+.block-finder-page-info {
+	color: #646970;
+	font-size: 13px;
+}
+
+.block-finder-page-buttons {
+	display: flex;
+	gap: 8px;
+}
+
+.block-finder-prev,
+.block-finder-next {
+	min-width: 80px;
 }

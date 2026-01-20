@@ -3,6 +3,7 @@
     "rules": {
         "at-rule-no-unknown": null,
         "selector-class-pattern": null,
+        "selector-id-pattern": null,
         "scss/at-rule-no-unknown": true
     }
   }
