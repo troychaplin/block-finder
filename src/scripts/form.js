@@ -213,6 +213,28 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	/**
+	 * Creates a loading skeleton HTML string.
+	 *
+	 * @return {string} The loading skeleton HTML.
+	 */
+	function createLoadingSkeleton() {
+		const skeletonItems = Array(5)
+			.fill('')
+			.map(
+				() =>
+					'<li class="skeleton-item"><span class="skeleton-text"></span><span class="skeleton-actions"></span></li>'
+			)
+			.join('');
+
+		return `
+			<div class="block-finder-loading">
+				<div class="skeleton-header"></div>
+				<ul class="skeleton-list">${skeletonItems}</ul>
+			</div>
+		`;
+	}
+
+	/**
 	 * Performs the block search AJAX request.
 	 *
 	 * @param {number} page The page number to fetch.
@@ -224,21 +246,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const postType = postTypeSelector.value;
 		const block = blockSelector.value;
+		const resultsContainer = document.getElementById('block-finder-results');
 
-		if (postType === '' || block === '') {
-			const resultsContainer = document.getElementById('block-finder-results');
+		if (postType === '' && block === '') {
 			resultsContainer.innerHTML =
-				'<p>Please select both a post type and a block to find.</p>';
+				'<div class="block-finder-empty-state"><p>Select a post type and block to search.</p></div>';
 			return;
 		}
 
-		const resultsContainer = document.getElementById('block-finder-results');
+		if (postType === '') {
+			resultsContainer.innerHTML =
+				'<div class="block-finder-empty-state"><p>Please select a post type.</p></div>';
+			return;
+		}
+
+		if (block === '') {
+			resultsContainer.innerHTML =
+				'<div class="block-finder-empty-state"><p>Please select a block to find.</p></div>';
+			return;
+		}
+
 		const submitButton = form.querySelector('button[type="submit"]');
 
-		// Show loading indicator.
+		// Show loading skeleton.
 		submitButton.disabled = true;
-		submitButton.textContent = 'Finding blocks...';
-		resultsContainer.innerHTML = '<p id="block-results-loading">Loading results...</p>';
+		submitButton.textContent = 'Searching...';
+		resultsContainer.innerHTML = createLoadingSkeleton();
 
 		const data = new URLSearchParams();
 		data.append('action', 'find_blocks');

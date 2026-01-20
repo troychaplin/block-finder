@@ -103,6 +103,19 @@ class Dashboard extends Plugin_Module {
 			}
 		);
 
+		// Show empty state if no blocks or post types are available.
+		if ( empty( $inserter_blocks ) || empty( $gutenberg_post_types ) ) {
+			echo '<div class="block-finder-empty-state">';
+			if ( empty( $gutenberg_post_types ) ) {
+				echo '<p>' . esc_html__( 'No post types with editor support found.', 'block-finder' ) . '</p>';
+			}
+			if ( empty( $inserter_blocks ) ) {
+				echo '<p>' . esc_html__( 'No blocks are registered.', 'block-finder' ) . '</p>';
+			}
+			echo '</div>';
+			return;
+		}
+
 		echo '<form id="block-finder-form">';
 		echo '<label for="post-type-selector">' . esc_html__( 'Select a post type you wish to search in', 'block-finder' ) . '</label>';
 		echo '<select id="post-type-selector" name="post_type">';
@@ -167,7 +180,20 @@ class Dashboard extends Plugin_Module {
 		$results = $this->tc_block_finder_database_search( $block, $post_type );
 
 		if ( empty( $results ) ) {
-			echo '<ul><li>' . esc_html__( 'No blocks found', 'block-finder' ) . '</li></ul>';
+			$block_name      = str_replace( 'core/', '', $block );
+			$block_label     = ucwords( str_replace( '-', ' ', $block_name ) );
+			$post_type_label = 'all' === $post_type
+				? esc_html__( 'any post type', 'block-finder' )
+				: get_post_type_object( $post_type )->labels->name ?? $post_type;
+
+			echo '<div class="block-finder-no-results">';
+			echo '<p>' . sprintf(
+				/* translators: 1: block name, 2: post type name */
+				esc_html__( 'No posts found using the %1$s block in %2$s.', 'block-finder' ),
+				'<strong>' . esc_html( $block_label ) . '</strong>',
+				'<strong>' . esc_html( $post_type_label ) . '</strong>'
+			) . '</p>';
+			echo '</div>';
 			wp_die();
 		}
 

@@ -108,8 +108,92 @@
 	}
 }
 
-#block-results-loading {
+// Empty state styles
+.block-finder-empty-state {
+	padding: 24px 12px;
+	text-align: center;
+	color: #646970;
+
+	p {
+		margin: 0;
+	}
+}
+
+// No results state
+.block-finder-no-results {
+	padding: 24px 12px;
+	text-align: center;
+	color: #646970;
+
+	p {
+		margin: 0;
+	}
+
+	strong {
+		color: #2c3338;
+	}
+}
+
+// Loading skeleton styles
+.block-finder-loading {
+	padding: 0;
+}
+
+.skeleton-header {
+	height: 24px;
+	background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+	background-size: 200% 100%;
+	animation: skeleton-pulse 1.5s ease-in-out infinite;
+	border-radius: 4px;
+	margin: 14px 12px;
+	width: 60%;
+}
+
+.skeleton-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.skeleton-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	padding: 14px 12px;
+	border-bottom: 1px dotted #b9b9b9;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.skeleton-text {
+	height: 16px;
+	background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+	background-size: 200% 100%;
+	animation: skeleton-pulse 1.5s ease-in-out infinite;
+	border-radius: 4px;
+	width: 45%;
+}
+
+.skeleton-actions {
+	height: 16px;
+	background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+	background-size: 200% 100%;
+	animation: skeleton-pulse 1.5s ease-in-out infinite;
+	border-radius: 4px;
+	width: 80px;
+}
+
+@keyframes skeleton-pulse {
+
+	0% {
+		background-position: 200% 0;
+	}
+
+	100% {
+		background-position: -200% 0;
+	}
 }
 
 #block-finder-results {
