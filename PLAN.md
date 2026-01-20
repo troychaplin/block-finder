@@ -4,25 +4,6 @@ This document outlines planned improvements for the Block Finder plugin.
 
 ---
 
-## Functionality Enhancements
-
-### 8. Nested/Inner Block Detection
-
-**Problem:** Current regex may miss blocks nested inside other blocks (e.g., paragraph inside a group or column).
-
-**Solution:**
-
-- Parse full block structure using `parse_blocks()` WordPress function
-- Recursively traverse `innerBlocks` arrays
-- Count blocks at all nesting levels
-- More accurate than regex-only approach
-
-**Files affected:**
-
-- `classes/class-dashboard.php`
-
----
-
 ## Code Quality
 
 ### 15. Add PHPUnit Tests

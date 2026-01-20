@@ -209,15 +209,15 @@ class Dashboard extends Plugin_Module {
 	/**
 	 * Performs a database-level search for posts containing a specific block.
 	 *
-	 * Uses $wpdb with LIKE clause to filter at the database level instead of
-	 * loading all posts into memory.
+	 * Uses $wpdb with LIKE clause to filter at the database level, then parses
+	 * block content to detect nesting levels and parent blocks.
 	 *
 	 * @since 1.1.0
 	 * @access private
 	 *
 	 * @param string $block     The block name to search for.
 	 * @param string $post_type The post type to search in, or 'all' for all types.
-	 * @return array Array of post data with id, title, edit_link, view_link.
+	 * @return array Array of post data with id, title, edit_link, view_link, and block_instances.
 	 */
 	private function tc_block_finder_database_search( $block, $post_type ) {
 		global $wpdb;
@@ -275,11 +275,15 @@ class Dashboard extends Plugin_Module {
 		foreach ( $posts as $post ) {
 			$post_title = $post->post_title ? $post->post_title : esc_html__( 'No title available', 'block-finder' );
 
+			// Parse blocks and find instances of the target block with nesting info.
+			$block_instances = $this->tc_block_finder_find_block_instances( $post->post_content, $block );
+
 			$results[] = array(
-				'id'        => $post->ID,
-				'title'     => $post_title,
-				'edit_link' => get_edit_post_link( $post->ID, 'raw' ),
-				'view_link' => get_permalink( $post->ID ),
+				'id'              => $post->ID,
+				'title'           => $post_title,
+				'edit_link'       => get_edit_post_link( $post->ID, 'raw' ),
+				'view_link'       => get_permalink( $post->ID ),
+				'block_instances' => $block_instances,
 			);
 		}
 
@@ -287,7 +291,64 @@ class Dashboard extends Plugin_Module {
 	}
 
 	/**
-	 * Renders the search results with pagination.
+	 * Finds all instances of a specific block in content with nesting information.
+	 *
+	 * @since 1.2.0
+	 * @access private
+	 *
+	 * @param string $content    The post content to parse.
+	 * @param string $block_name The block name to search for (e.g., 'core/paragraph').
+	 * @return array Array of block instances with nesting info.
+	 */
+	private function tc_block_finder_find_block_instances( $content, $block_name ) {
+		$parsed_blocks = parse_blocks( $content );
+		$instances     = array();
+
+		$this->tc_block_finder_traverse_blocks( $parsed_blocks, $block_name, array(), $instances );
+
+		return $instances;
+	}
+
+	/**
+	 * Recursively traverses blocks to find instances of a target block.
+	 *
+	 * @since 1.2.0
+	 * @access private
+	 *
+	 * @param array  $blocks      Array of parsed blocks.
+	 * @param string $target_name The block name to find.
+	 * @param array  $parent_chain Array of parent block names leading to current level.
+	 * @param array  $instances   Reference to array collecting found instances.
+	 * @return void
+	 */
+	private function tc_block_finder_traverse_blocks( $blocks, $target_name, $parent_chain, &$instances ) {
+		foreach ( $blocks as $block ) {
+			// Skip empty or null blocks.
+			if ( empty( $block['blockName'] ) ) {
+				continue;
+			}
+
+			$current_block_name = $block['blockName'];
+
+			// Check if this block matches our target.
+			if ( $current_block_name === $target_name ) {
+				$instances[] = array(
+					'is_root'      => empty( $parent_chain ),
+					'parent_chain' => $parent_chain,
+					'depth'        => count( $parent_chain ),
+				);
+			}
+
+			// Recursively check inner blocks.
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$new_parent_chain = array_merge( $parent_chain, array( $current_block_name ) );
+				$this->tc_block_finder_traverse_blocks( $block['innerBlocks'], $target_name, $new_parent_chain, $instances );
+			}
+		}
+	}
+
+	/**
+	 * Renders the search results with pagination and filter buttons.
 	 *
 	 * @since 1.1.0
 	 * @access private
@@ -310,17 +371,107 @@ class Dashboard extends Plugin_Module {
 		$block_name     = str_replace( 'core/', '', $block );
 		$category_title = ucwords( str_replace( '-', ' ', $block_name ) ) . ' Block';
 
+		// Count posts with root vs nested instances (not instance counts).
+		$root_post_count   = 0;
+		$nested_post_count = 0;
+		foreach ( $results as $result ) {
+			$has_root   = false;
+			$has_nested = false;
+			if ( ! empty( $result['block_instances'] ) ) {
+				foreach ( $result['block_instances'] as $instance ) {
+					if ( $instance['is_root'] ) {
+						$has_root = true;
+					} else {
+						$has_nested = true;
+					}
+				}
+			}
+			if ( $has_root ) {
+				++$root_post_count;
+			}
+			if ( $has_nested ) {
+				++$nested_post_count;
+			}
+		}
+
 		// Results header with count.
 		echo '<h3>' . esc_html( $category_title ) . esc_html__( ' is used in the following:', 'block-finder' );
-		echo ' <span class="block-finder-count">(' . esc_html( $total_results ) . ' ' . esc_html( _n( 'result', 'results', $total_results, 'block-finder' ) ) . ')</span>';
+		echo ' <span class="block-finder-count">(' . esc_html( $total_results ) . ' ' . esc_html( _n( 'post', 'posts', $total_results, 'block-finder' ) ) . ')</span>';
 		echo '</h3>';
+
+		// Filter buttons (only show if there are both root and nested posts).
+		if ( $root_post_count > 0 && $nested_post_count > 0 ) {
+			echo '<div class="block-finder-filters">';
+			echo '<button type="button" class="button block-finder-filter active" data-filter="all">';
+			/* translators: %d: total number of posts */
+			echo esc_html( sprintf( __( 'All (%d)', 'block-finder' ), $total_results ) );
+			echo '</button>';
+			echo '<button type="button" class="button block-finder-filter" data-filter="root">';
+			/* translators: %d: number of posts with parent blocks */
+			echo esc_html( sprintf( __( 'Parent Block (%d)', 'block-finder' ), $root_post_count ) );
+			echo '</button>';
+			echo '<button type="button" class="button block-finder-filter" data-filter="nested">';
+			/* translators: %d: number of posts with inner blocks */
+			echo esc_html( sprintf( __( 'InnerBlock (%d)', 'block-finder' ), $nested_post_count ) );
+			echo '</button>';
+			echo '</div>';
+		}
 
 		// Results list.
 		echo '<ul class="block-finder-list">';
 		foreach ( $paged_results as $result ) {
-			echo '<li>';
-			echo esc_html( $result['title'] );
-			echo '<span>';
+			// Determine if this post has root and/or nested instances.
+			$has_root   = false;
+			$has_nested = false;
+			if ( ! empty( $result['block_instances'] ) ) {
+				foreach ( $result['block_instances'] as $instance ) {
+					if ( $instance['is_root'] ) {
+						$has_root = true;
+					} else {
+						$has_nested = true;
+					}
+				}
+			}
+
+			// Build data attributes for filtering.
+			$data_attrs = '';
+			if ( $has_root ) {
+				$data_attrs .= ' data-has-root="1"';
+			}
+			if ( $has_nested ) {
+				$data_attrs .= ' data-has-nested="1"';
+			}
+
+			echo '<li' . $data_attrs . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<div class="block-finder-result-content">';
+			echo '<span class="block-finder-result-title">' . esc_html( $result['title'] ) . '</span>';
+
+			// Show context indicators for nested blocks only.
+			if ( ! empty( $result['block_instances'] ) ) {
+				$nested_parents = array();
+				foreach ( $result['block_instances'] as $instance ) {
+					if ( ! $instance['is_root'] && ! empty( $instance['parent_chain'] ) ) {
+						// Get the immediate parent (last item in the chain).
+						$immediate_parent = end( $instance['parent_chain'] );
+						// Remove namespace prefix and format the name.
+						$parent_name                    = preg_replace( '/^[a-z0-9-]+\//', '', $immediate_parent );
+						$parent_name                    = ucwords( str_replace( '-', ' ', $parent_name ) );
+						$nested_parents[ $parent_name ] = true;
+					}
+				}
+
+				// Only show parent indicators if there are nested instances.
+				if ( ! empty( $nested_parents ) ) {
+					echo '<span class="block-finder-context">';
+					foreach ( array_keys( $nested_parents ) as $parent_name ) {
+						echo '<span class="context-nested" data-type="nested">' . esc_html__( 'Parent:', 'block-finder' ) . ' ' . esc_html( $parent_name ) . '</span>';
+					}
+					echo '</span>';
+				}
+			}
+
+			echo '</div>';
+			echo '<span class="block-finder-result-actions">';
 			echo '<a href="' . esc_url( $result['edit_link'] ) . '">' . esc_html__( 'Edit', 'block-finder' ) . '</a>';
 			echo '<a href="' . esc_url( $result['view_link'] ) . '">' . esc_html__( 'View', 'block-finder' ) . '</a>';
 			echo '</span>';

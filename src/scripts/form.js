@@ -293,8 +293,9 @@ document.addEventListener('DOMContentLoaded', () => {
 				const responseText = await response.text();
 				resultsContainer.innerHTML = responseText;
 
-				// Attach pagination event listeners.
+				// Attach event listeners.
 				attachPaginationListeners();
+				attachFilterListeners();
 			} else {
 				const errorData = await response.json();
 				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message}</p>`;
@@ -328,6 +329,69 @@ document.addEventListener('DOMContentLoaded', () => {
 				performSearch(page);
 			});
 		}
+	}
+
+	/**
+	 * Attaches click event listeners to filter buttons.
+	 */
+	function attachFilterListeners() {
+		const resultsContainer = document.getElementById('block-finder-results');
+		const filterButtons = resultsContainer.querySelectorAll('.block-finder-filter');
+
+		if (filterButtons.length === 0) {
+			return;
+		}
+
+		filterButtons.forEach(button => {
+			button.addEventListener('click', () => {
+				// Update active state.
+				filterButtons.forEach(btn => btn.classList.remove('active'));
+				button.classList.add('active');
+
+				// Get filter type.
+				const filterType = button.dataset.filter;
+
+				// Filter results.
+				filterResults(filterType);
+			});
+		});
+	}
+
+	/**
+	 * Filters the results list based on the selected filter type.
+	 *
+	 * @param {string} filterType The filter type: 'all', 'root', or 'nested'.
+	 */
+	function filterResults(filterType) {
+		const resultsContainer = document.getElementById('block-finder-results');
+		const resultItems = resultsContainer.querySelectorAll('.block-finder-list li');
+
+		resultItems.forEach(item => {
+			const hasRoot = item.dataset.hasRoot === '1';
+			const hasNested = item.dataset.hasNested === '1';
+			const contextElement = item.querySelector('.block-finder-context');
+
+			// Show/hide list items based on filter.
+			if (filterType === 'all') {
+				item.style.display = '';
+				// Show parent indicator for all.
+				if (contextElement) {
+					contextElement.style.display = '';
+				}
+			} else if (filterType === 'root') {
+				item.style.display = hasRoot ? '' : 'none';
+				// Hide parent indicator when filtering to root.
+				if (contextElement) {
+					contextElement.style.display = 'none';
+				}
+			} else if (filterType === 'nested') {
+				item.style.display = hasNested ? '' : 'none';
+				// Show parent indicator for nested.
+				if (contextElement) {
+					contextElement.style.display = '';
+				}
+			}
+		});
 	}
 
 	form.addEventListener('submit', async e => {

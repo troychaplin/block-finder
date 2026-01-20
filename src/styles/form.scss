@@ -208,6 +208,34 @@
 	margin: 0;
 }
 
+// Filter buttons
+.block-finder-filters {
+	display: flex;
+	gap: 8px;
+	padding: 12px;
+	background-color: #fff;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.block-finder-filter {
+	font-size: 12px;
+	padding: 4px 12px;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+
+	&.active {
+		background-color: #2271b1;
+		border-color: #2271b1;
+		color: #fff;
+	}
+
+	&:hover:not(.active) {
+		background-color: #f0f0f1;
+		border-color: #8c8f94;
+	}
+}
+
 #block-finder-results ul {
 	list-style-type: none;
 	padding: 0;
@@ -220,32 +248,64 @@
 	padding: 14px 12px;
 	margin-bottom: 0;
 	border-bottom: 1px dotted #b9b9b9;
+	align-items: flex-start;
 }
 
 #block-finder-results li:last-child {
 	border-bottom: none;
 }
 
-#block-finder-results span {
+// Result content wrapper
+.block-finder-result-content {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+	min-width: 0;
+}
+
+.block-finder-result-title {
+	font-weight: 500;
+	color: #1d2327;
+}
+
+// Context indicators
+.block-finder-context {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-left: 0 !important;
+}
+
+.context-nested {
+	font-size: 11px;
+	font-style: italic;
+	color: #50575e;
+	padding: 2px 0;
+}
+
+// Result actions
+.block-finder-result-actions {
 	margin-left: auto;
 	display: flex;
 	gap: 8px;
 	align-items: center;
+	flex-shrink: 0;
+
+	a:last-child {
+		border-left: 1px solid #b9b9b9;
+		padding-left: 8px;
+	}
 }
 
 #block-finder-results a {
 	font-weight: 500;
 	color: #0073aa;
 	text-decoration: none;
-}
 
-#block-finder-results a:last-child {
-	border-left: 1px solid #b9b9b9;
-	padding-left: 8px;
-}
-
-#block-finder-results a:hover {
-	text-decoration: underline;
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
 // Results count badge
