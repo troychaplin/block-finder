@@ -420,7 +420,6 @@ class Dashboard extends Plugin_Module {
 			/* translators: %d: total number of posts */
 			echo esc_html( sprintf( __( 'All Blocks (%d)', 'block-finder' ), $all_count ) );
 			echo '</a>';
-			// echo '<span class="block-finder-filter-sep">|</span>';
 			echo '<a href="#" class="block-finder-filter-link' . ( 'nested' === $filter ? ' active' : '' ) . '" data-filter="nested">';
 			/* translators: %d: number of posts with inner blocks */
 			echo esc_html( sprintf( __( 'InnerBlocks (%d)', 'block-finder' ), $nested_count ) );
