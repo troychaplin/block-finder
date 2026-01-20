@@ -1,27 +1,40 @@
-/* global blockFinderAjax */
+/**
+ * Block Finder Ajax global object interface.
+ */
+interface BlockFinderAjax {
+	ajax_url: string;
+	nonce: string;
+}
+
+declare const blockFinderAjax: BlockFinderAjax;
+
 document.addEventListener('DOMContentLoaded', () => {
-	const form = document.getElementById('block-finder-form');
+	const form = document.getElementById('block-finder-form') as HTMLFormElement | null;
+
+	if (!form) {
+		return;
+	}
 
 	/**
 	 * Converts a select element into an autocomplete dropdown.
 	 *
-	 * @param {HTMLElement} selectElement   The select element to convert.
-	 * @param {string}      placeholderText Placeholder text for the search input.
+	 * @param selectElement   The select element to convert.
+	 * @param placeholderText Placeholder text for the search input.
 	 */
-	function makeAutocomplete(selectElement, placeholderText) {
+	function makeAutocomplete(selectElement: HTMLSelectElement, placeholderText: string): void {
 		// Create wrapper
 		const wrapper = document.createElement('div');
 		wrapper.className = 'autocomplete-wrapper';
 		wrapper.style.position = 'relative';
 
-		selectElement.parentNode.insertBefore(wrapper, selectElement);
+		selectElement.parentNode?.insertBefore(wrapper, selectElement);
 
 		// Hide the original select but keep it for form submission
 		selectElement.style.display = 'none';
 		wrapper.appendChild(selectElement);
 
 		// Store original options (excluding placeholder)
-		const originalOptions = Array.from(selectElement.options).filter(
+		const originalOptions: HTMLOptionElement[] = Array.from(selectElement.options).filter(
 			option => option.value !== ''
 		);
 
@@ -39,10 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		wrapper.appendChild(dropdown);
 
 		let selectedIndex = -1;
-		let filteredOptions = [];
+		let filteredOptions: HTMLOptionElement[] = [];
 
 		// Show filtered options
-		function showFilteredOptions() {
+		function showFilteredOptions(): void {
 			const searchTerm = autocompleteInput.value.toLowerCase().trim();
 			dropdown.innerHTML = '';
 
@@ -52,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			} else {
 				// Filter options based on search term
 				filteredOptions = originalOptions.filter(option => {
-					const text = option.textContent.toLowerCase();
+					const text = (option.textContent || '').toLowerCase();
 					return text.includes(searchTerm);
 				});
 			}
@@ -73,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				item.className = 'autocomplete-item';
 				item.textContent = option.textContent;
 				item.dataset.value = option.value;
-				item.dataset.index = index;
+				item.dataset.index = index.toString();
 
 				item.addEventListener('click', () => {
 					selectOption(option);
@@ -98,8 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		// Update highlight on hover/keyboard
-		function updateHighlight() {
-			const items = dropdown.querySelectorAll('.autocomplete-item:not(.no-results)');
+		function updateHighlight(): void {
+			const items = dropdown.querySelectorAll<HTMLElement>(
+				'.autocomplete-item:not(.no-results)'
+			);
 			items.forEach((item, index) => {
 				if (index === selectedIndex) {
 					item.classList.add('highlighted');
@@ -114,9 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		// Select an option
-		function selectOption(option) {
+		function selectOption(option: HTMLOptionElement): void {
 			selectElement.value = option.value;
-			autocompleteInput.value = option.textContent;
+			autocompleteInput.value = option.textContent || '';
 			dropdown.classList.remove('show');
 			selectedIndex = -1;
 
@@ -135,8 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		// Keyboard navigation
-		autocompleteInput.addEventListener('keydown', e => {
-			const items = dropdown.querySelectorAll('.autocomplete-item:not(.no-results)');
+		autocompleteInput.addEventListener('keydown', (e: KeyboardEvent) => {
+			const items = dropdown.querySelectorAll<HTMLElement>(
+				'.autocomplete-item:not(.no-results)'
+			);
 
 			if (e.key === 'ArrowDown') {
 				e.preventDefault();
@@ -168,8 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		// Close dropdown when clicking outside
-		document.addEventListener('click', e => {
-			if (!wrapper.contains(e.target)) {
+		document.addEventListener('click', (e: MouseEvent) => {
+			if (!wrapper.contains(e.target as Node)) {
 				dropdown.classList.remove('show');
 				selectedIndex = -1;
 			}
@@ -179,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (selectElement.value) {
 			const selectedOption = selectElement.options[selectElement.selectedIndex];
 			if (selectedOption && selectedOption.value) {
-				autocompleteInput.value = selectedOption.textContent;
+				autocompleteInput.value = selectedOption.textContent || '';
 			}
 		}
 
@@ -193,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					// Restore selected value if input was cleared
 					const selectedOption = selectElement.options[selectElement.selectedIndex];
 					if (selectedOption && selectedOption.value && !autocompleteInput.value) {
-						autocompleteInput.value = selectedOption.textContent;
+						autocompleteInput.value = selectedOption.textContent || '';
 					}
 				}
 				dropdown.classList.remove('show');
@@ -202,8 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Initialize autocomplete dropdowns
-	const postTypeSelector = document.getElementById('post-type-selector');
-	const blockSelector = document.getElementById('block-finder-selector');
+	const postTypeSelector = document.getElementById(
+		'post-type-selector'
+	) as HTMLSelectElement | null;
+	const blockSelector = document.getElementById(
+		'block-finder-selector'
+	) as HTMLSelectElement | null;
 
 	if (postTypeSelector) {
 		makeAutocomplete(postTypeSelector, 'Search post types...');
@@ -212,9 +233,38 @@ document.addEventListener('DOMContentLoaded', () => {
 		makeAutocomplete(blockSelector, 'Search blocks...');
 	}
 
-	form.addEventListener('submit', async e => {
-		e.preventDefault();
+	/**
+	 * Creates a loading skeleton HTML string.
+	 *
+	 * @return The loading skeleton HTML.
+	 */
+	function createLoadingSkeleton(): string {
+		const skeletonItems = Array(5)
+			.fill('')
+			.map(
+				() =>
+					'<li class="skeleton-item"><span class="skeleton-text"></span><span class="skeleton-actions"></span></li>'
+			)
+			.join('');
 
+		return `
+			<div class="block-finder-loading">
+				<div class="skeleton-header"></div>
+				<ul class="skeleton-list">${skeletonItems}</ul>
+			</div>
+		`;
+	}
+
+	// Track current filter state.
+	let currentFilter = 'all';
+
+	/**
+	 * Performs the block search AJAX request.
+	 *
+	 * @param page   The page number to fetch.
+	 * @param filter The filter type: 'all', 'root', or 'nested'.
+	 */
+	async function performSearch(page: number = 1, filter: string = 'all'): Promise<void> {
 		if (!postTypeSelector || !blockSelector) {
 			return;
 		}
@@ -222,25 +272,51 @@ document.addEventListener('DOMContentLoaded', () => {
 		const postType = postTypeSelector.value;
 		const block = blockSelector.value;
 		const resultsContainer = document.getElementById('block-finder-results');
-		const submitButton = form.querySelector('button[type="submit"]');
 
-		// Show loading indicator
-		submitButton.disabled = true;
-		submitButton.textContent = 'Finding blocks...';
-		resultsContainer.innerHTML = '<p id="block-results-loading">Loading results...</p>';
-
-		if (postType === '' || block === '') {
-			resultsContainer.innerHTML =
-				'<p>Please select both a post type and a block to find.</p>';
-			submitButton.disabled = false;
-			submitButton.textContent = 'Find Block';
+		if (!resultsContainer) {
 			return;
 		}
+
+		if (postType === '' && block === '') {
+			resultsContainer.innerHTML =
+				'<div class="block-finder-empty-state"><p>Select a post type and block to search.</p></div>';
+			return;
+		}
+
+		if (postType === '') {
+			resultsContainer.innerHTML =
+				'<div class="block-finder-empty-state"><p>Please select a post type.</p></div>';
+			return;
+		}
+
+		if (block === '') {
+			resultsContainer.innerHTML =
+				'<div class="block-finder-empty-state"><p>Please select a block to find.</p></div>';
+			return;
+		}
+
+		const submitButton = form?.querySelector(
+			'button[type="submit"]'
+		) as HTMLButtonElement | null;
+
+		if (!form || !submitButton) {
+			return;
+		}
+
+		// Update current filter state.
+		currentFilter = filter;
+
+		// Show loading skeleton.
+		submitButton.disabled = true;
+		submitButton.textContent = 'Searching...';
+		resultsContainer.innerHTML = createLoadingSkeleton();
 
 		const data = new URLSearchParams();
 		data.append('action', 'find_blocks');
 		data.append('post_type', postType);
 		data.append('block', block);
+		data.append('page', page.toString());
+		data.append('filter', filter);
 		data.append('nonce', blockFinderAjax.nonce);
 
 		try {
@@ -255,15 +331,84 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (response.ok) {
 				const responseText = await response.text();
 				resultsContainer.innerHTML = responseText;
+
+				// Attach event listeners.
+				attachPaginationListeners();
+				attachFilterListeners();
 			} else {
 				const errorData = await response.json();
 				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message}</p>`;
 			}
 		} catch (error) {
-			resultsContainer.innerHTML = `<p>An error occurred: ${error.message}</p>`;
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			resultsContainer.innerHTML = `<p>An error occurred: ${errorMessage}</p>`;
 		} finally {
 			submitButton.disabled = false;
 			submitButton.textContent = 'Find Block';
 		}
+	}
+
+	/**
+	 * Attaches click event listeners to pagination buttons.
+	 */
+	function attachPaginationListeners(): void {
+		const resultsContainer = document.getElementById('block-finder-results');
+
+		if (!resultsContainer) {
+			return;
+		}
+
+		const prevButton = resultsContainer.querySelector(
+			'.block-finder-prev'
+		) as HTMLButtonElement | null;
+		const nextButton = resultsContainer.querySelector(
+			'.block-finder-next'
+		) as HTMLButtonElement | null;
+
+		if (prevButton) {
+			prevButton.addEventListener('click', () => {
+				const page = parseInt(prevButton.dataset.page || '1', 10);
+				performSearch(page, currentFilter);
+			});
+		}
+
+		if (nextButton) {
+			nextButton.addEventListener('click', () => {
+				const page = parseInt(nextButton.dataset.page || '1', 10);
+				performSearch(page, currentFilter);
+			});
+		}
+	}
+
+	/**
+	 * Attaches click event listeners to filter links.
+	 */
+	function attachFilterListeners(): void {
+		const resultsContainer = document.getElementById('block-finder-results');
+
+		if (!resultsContainer) {
+			return;
+		}
+
+		const filterLinks = resultsContainer.querySelectorAll<HTMLAnchorElement>(
+			'.block-finder-filter-link'
+		);
+
+		filterLinks.forEach(link => {
+			link.addEventListener('click', e => {
+				e.preventDefault();
+				const filterType = link.dataset.filter || 'all';
+
+				// Perform new search with filter (resets to page 1).
+				performSearch(1, filterType);
+			});
+		});
+	}
+
+	form.addEventListener('submit', async (e: Event) => {
+		// Reset filter when submitting a new search.
+		currentFilter = 'all';
+		e.preventDefault();
+		performSearch(1);
 	});
 });
