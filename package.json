@@ -22,11 +22,11 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@wordpress/env": "^10.35.0",
-		"@wordpress/eslint-plugin": "^22.21.0",
-		"@wordpress/prettier-config": "^4.35.0",
-		"@wordpress/scripts": "^31.0.0",
-		"@wordpress/stylelint-config": "^23.27.0",
+		"@wordpress/env": "^10.38.0",
+		"@wordpress/eslint-plugin": "^24.0.0",
+		"@wordpress/prettier-config": "^4.38.0",
+		"@wordpress/scripts": "^31.3.0",
+		"@wordpress/stylelint-config": "^23.30.0",
 		"eslint-config-prettier": "^10.1.8",
 		"husky": "^9.1.7",
 		"stylelint": "^16.25.0",
