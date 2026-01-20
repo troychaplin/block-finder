@@ -16,6 +16,21 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.0.7]
+
+### Added
+
+-   InnerBlock detection to identify blocks nested inside other blocks
+-   Filter toggle to switch between "All Blocks" and "InnerBlocks" views
+-   Context indicators showing parent block names for nested blocks
+-   Server-side filtering for accurate pagination with filters applied
+
+### Changed
+
+-   Migrated JavaScript to TypeScript for improved type safety
+-   Updated README.md and readme.txt with new feature documentation
+-   Improved filter UI with pill-style toggle buttons
+
 ## [1.0.6]
 
 ### Added

@@ -1,6 +1,6 @@
 {
 	"name": "block-finder",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "Add block checks in the editor to support publishing accessible content",
 	"author": "Troy Chaplin",
 	"license": "GPL-2.0-or-later",
