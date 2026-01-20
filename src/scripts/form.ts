@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	/**
-	 * Attaches click event listeners to filter buttons.
+	 * Attaches click event listeners to filter links.
 	 */
 	function attachFilterListeners(): void {
 		const resultsContainer = document.getElementById('block-finder-results');
@@ -390,13 +390,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
-		const filterButtons = resultsContainer.querySelectorAll<HTMLButtonElement>(
-			'.block-finder-filter-btn'
+		const filterLinks = resultsContainer.querySelectorAll<HTMLAnchorElement>(
+			'.block-finder-filter-link'
 		);
 
-		filterButtons.forEach(button => {
-			button.addEventListener('click', () => {
-				const filterType = button.dataset.filter || 'all';
+		filterLinks.forEach(link => {
+			link.addEventListener('click', e => {
+				e.preventDefault();
+				const filterType = link.dataset.filter || 'all';
 
 				// Perform new search with filter (resets to page 1).
 				performSearch(1, filterType);

@@ -208,48 +208,43 @@
 	margin: 0;
 }
 
-// Filter buttons
+// Filter links
 .block-finder-filters {
 	display: flex;
 	align-items: center;
+	justify-content: flex-end;
 	gap: 8px;
 	padding: 12px;
 	background-color: #fff;
 	border-bottom: 1px solid #c3c4c7;
 }
 
-.block-finder-filter-btn {
-	padding: 6px 12px;
+.block-finder-filter-link {
 	font-size: 13px;
-	line-height: 1.4;
-	border: 1px solid #c3c4c7;
-	border-radius: 3px;
-	background-color: #f6f7f7;
-	color: #2c3338;
+	color: #646970;
+	text-decoration: none;
 	cursor: pointer;
-	transition: background-color 0.1s ease, border-color 0.1s ease;
-
-	&:hover {
-		background-color: #f0f0f1;
-		border-color: #8c8f94;
-	}
-
-	&:focus {
-		outline: none;
-		border-color: #2271b1;
-		box-shadow: 0 0 0 1px #2271b1;
+    padding: 4px 8px;
+    background-color: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    
+	&:hover, &.active {
+        color: #fff;
+        background-color: #2271b1;
+        border-color: #2271b1;
 	}
 
 	&.active {
-		background-color: #2271b1;
-		border-color: #2271b1;
-		color: #fff;
-
-		&:hover {
-			background-color: #135e96;
-			border-color: #135e96;
-		}
+		cursor: default;
+		pointer-events: none;
 	}
+}
+
+.block-finder-filter-sep {
+	color: #c3c4c7;
+	font-size: 13px;
 }
 
 #block-finder-results ul {
@@ -314,15 +309,15 @@
 	}
 }
 
-#block-finder-results a {
-	font-weight: 500;
-	color: #0073aa;
-	text-decoration: none;
+// #block-finder-results a {
+// 	font-weight: 500;
+// 	color: #0073aa;
+// 	text-decoration: none;
 
-	&:hover {
-		text-decoration: underline;
-	}
-}
+// 	&:hover {
+// 		text-decoration: underline;
+// 	}
+// }
 
 // Results count badge
 .block-finder-count {

@@ -413,17 +413,18 @@ class Dashboard extends Plugin_Module {
 		echo ' <span class="block-finder-count">(' . esc_html( $total_results ) . ' ' . esc_html( _n( 'post', 'posts', $total_results, 'block-finder' ) ) . ')</span>';
 		echo '</h3>';
 
-		// Filter buttons (only show if there are posts with nested blocks).
+		// Filter links (only show if there are posts with nested blocks).
 		if ( $nested_count > 0 ) {
 			echo '<div class="block-finder-filters">';
-			echo '<button type="button" class="block-finder-filter-btn' . ( 'all' === $filter ? ' active' : '' ) . '" data-filter="all">';
+			echo '<a href="#" class="block-finder-filter-link' . ( 'all' === $filter ? ' active' : '' ) . '" data-filter="all">';
 			/* translators: %d: total number of posts */
 			echo esc_html( sprintf( __( 'All Blocks (%d)', 'block-finder' ), $all_count ) );
-			echo '</button>';
-			echo '<button type="button" class="block-finder-filter-btn' . ( 'nested' === $filter ? ' active' : '' ) . '" data-filter="nested">';
+			echo '</a>';
+			// echo '<span class="block-finder-filter-sep">|</span>';
+			echo '<a href="#" class="block-finder-filter-link' . ( 'nested' === $filter ? ' active' : '' ) . '" data-filter="nested">';
 			/* translators: %d: number of posts with inner blocks */
 			echo esc_html( sprintf( __( 'InnerBlocks (%d)', 'block-finder' ), $nested_count ) );
-			echo '</button>';
+			echo '</a>';
 			echo '</div>';
 		}
 

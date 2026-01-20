@@ -2,22 +2,34 @@
 
 # Block Finder
 
-Adds a dashboard that select list of active Gutenberg blocks on a site and returns a list of pages, post and other post types where that block is being used.
+Adds a dashboard metabox that allows you to quickly find and edit specific core or custom blocks across all post types on your site.
 
-## Installation & Usage
+## Features
 
--   Upload the plugin files to the `/wp-content/plugins/`
--   Activate the plugin through the `Plugins` screen in WordPress
+- **Search by Post Type**: Filter results by pages, posts, or any custom post type
+- **Search by Block**: Find any core or custom Gutenberg block
+- **Autocomplete Search**: Type to quickly filter through available blocks and post types
+- **InnerBlock Detection**: Identify blocks used inside other blocks (e.g., a Paragraph inside a Media & Text block)
+- **Filter by Block Context**: Toggle between viewing all blocks or only those used as InnerBlocks
+- **Paginated Results**: Browse through large result sets with built-in pagination
+- **Direct Edit Links**: Jump straight to editing any post containing the block
+
+## Installation
+
+- Upload the plugin files to the `/wp-content/plugins/` directory
+- Activate the plugin through the `Plugins` screen in WordPress
 
 ## Usage
 
--   Once activated head to the dashboard
--   Look for the "Block Finder" item
--   Select your post type and block
--   Click "Find Block"
+1. Navigate to the WordPress Dashboard
+2. Find the "Block Finder" metabox
+3. Select a post type from the dropdown (or type to search)
+4. Select a block from the dropdown (or type to search)
+5. Click "Find Block" to see results
+6. Use the filter links to toggle between "All Blocks" and "InnerBlocks" views
 
-<img src="./assets/screenshot-1.png" alt="Image 2" width="50%"/>
-<img src="./assets/screenshot-2.png" alt="Image 2" width="50%"/>
+<img src="./assets/screenshot-1.png" alt="Block Finder empty state" width="50%"/>
+<img src="./assets/screenshot-2.png" alt="Block Finder with results" width="50%"/>
 
 ## Getting Involved
 
