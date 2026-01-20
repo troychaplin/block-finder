@@ -4,100 +4,7 @@ This document outlines planned improvements for the Block Finder plugin.
 
 ---
 
-## Performance Improvements
-
-### ~~1. Add Result Caching~~ ✅
-
-~~**Problem:** Every search scans all posts, even for repeated identical queries.~~
-
-~~**Solution:**~~
-
-- ~~Implement transient-based caching for search results~~
-- ~~Cache key based on hash of block name + post type~~
-- ~~Set reasonable expiration (e.g., 1 hour)~~
-- ~~Invalidate cache on post save/update/delete via `save_post` hook~~
-- ~~Add option to force refresh/bypass cache~~
-
-~~**Files affected:**~~
-
-- ~~`classes/class-dashboard.php`~~
-
----
-
-### ~~2. Paginate Results~~ ✅
-
-~~**Problem:** Using `nopaging=true` loads all posts into memory, which can cause performance issues on large sites.~~
-
-~~**Solution:**~~
-
-- ~~Add pagination to search results~~
-- ~~Limit initial results (e.g., 20 per page)~~
-- ~~Add "Load More" button or pagination controls~~
-- ~~Update AJAX handler to accept page/offset parameter~~
-- ~~Display total count of matching posts~~
-
-~~**Files affected:**~~
-
-- ~~`classes/class-dashboard.php`~~
-- ~~`src/scripts/form.js`~~
-- ~~`src/styles.scss`~~
-
----
-
-### ~~3. Database-Level Search~~ ✅
-
-~~**Problem:** Current implementation loads all posts then regex matches in PHP, which is inefficient.~~
-
-~~**Solution:**~~
-
-- ~~Use `$wpdb` direct query with `LIKE '%<!-- wp:blockname%'` in WHERE clause~~
-- ~~Move filtering to database level instead of PHP memory~~
-- ~~Combine with pagination for optimal performance~~
-- ~~Consider adding database index recommendations for large sites~~
-
-~~**Files affected:**~~
-
-- ~~`classes/class-dashboard.php`~~
-
----
-
 ## Functionality Enhancements
-
-### 5. Show Block Count Per Post
-
-**Problem:** Currently only shows that a block exists in a post, not how many times it's used.
-
-**Solution:**
-
-- Use `preg_match_all()` instead of `preg_match()` to count occurrences
-- Display count next to each post in results (e.g., "Post Title (3 instances)")
-- Consider adding sort option by count
-
-**Files affected:**
-
-- `classes/class-dashboard.php`
-- `src/styles.scss` (for count badge styling)
-
----
-
-### 7. Export Results
-
-**Problem:** No way to export search results for reporting or further analysis.
-
-**Solution:**
-
-- Add "Export CSV" button below results
-- CSV columns: Post ID, Title, Edit URL, View URL, Block Count
-- Generate CSV server-side via new AJAX endpoint
-- Trigger browser download with proper headers
-
-**Files affected:**
-
-- `classes/class-dashboard.php` (new AJAX handler)
-- `src/scripts/form.js` (export button handler)
-- `src/styles.scss` (button styling)
-
----
 
 ### 8. Nested/Inner Block Detection
 
@@ -117,25 +24,6 @@ This document outlines planned improvements for the Block Finder plugin.
 ---
 
 ## UX Improvements
-
-### 11. Show Block Icon
-
-**Problem:** Block dropdown only shows text names, making it harder to identify blocks quickly.
-
-**Solution:**
-
-- Retrieve block icon from block registration data
-- Include icon in dropdown option data attribute
-- Render icon (SVG or Dashicon) next to block name in autocomplete
-- Handle blocks without icons gracefully (show default block icon)
-
-**Files affected:**
-
-- `classes/class-dashboard.php` (pass icon data)
-- `src/scripts/form.js` (render icons in dropdown)
-- `src/styles.scss` (icon sizing/alignment)
-
----
 
 ### 12. Empty State Messaging
 
@@ -175,21 +63,6 @@ This document outlines planned improvements for the Block Finder plugin.
 ---
 
 ## Code Quality
-
-### ~~14. Fix class-dashboard.php Header~~ ✅
-
-~~**Problem:** File header comment incorrectly says "Class Enqueues" instead of "Class Dashboard".~~
-
-~~**Solution:**~~
-
-- ~~Update the DocBlock header to correctly identify the class~~
-- ~~Review other files for similar inconsistencies~~
-
-~~**Files affected:**~~
-
-- ~~`classes/class-dashboard.php`~~
-
----
 
 ### 15. Add PHPUnit Tests
 
@@ -238,37 +111,3 @@ This document outlines planned improvements for the Block Finder plugin.
 - `webpack.config.js`
 - `package.json` (TypeScript dependencies)
 - New `tsconfig.json`
-
----
-
-## Implementation Priority
-
-Suggested order based on dependencies and impact:
-
-1. **Phase 1 - Foundation**
-   - [x] 14. Fix class-dashboard.php header (quick win)
-   - [x] 3. Database-level search (foundation for performance)
-   - [ ] 8. Nested/inner block detection (improves accuracy)
-
-2. **Phase 2 - Performance**
-   - [x] 1. Add result caching
-   - [x] 2. Paginate results
-   - [ ] 5. Show block count per post
-
-3. **Phase 3 - UX Polish**
-   - [ ] 13. Loading skeleton
-   - [ ] 12. Empty state messaging
-   - [ ] 11. Show block icon
-
-4. **Phase 4 - Features & Quality**
-   - [ ] 7. Export results
-   - [ ] 16. TypeScript migration
-   - [ ] 15. Add PHPUnit tests
-
----
-
-## Notes
-
-- Version bump strategy: Minor version for each phase completion
-- Maintain backward compatibility with existing WordPress versions (6.0+)
-- Test on both single site and multisite installations
