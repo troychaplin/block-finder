@@ -21,6 +21,7 @@ class ComposerStaticInitbe4768179afec99e6e27eb5d01bc7e98
     );
 
     public static $classMap = array (
+        'Block_Finder\\CLI_Command' => __DIR__ . '/../..' . '/classes/class-cli-command.php',
         'Block_Finder\\Dashboard' => __DIR__ . '/../..' . '/classes/class-dashboard.php',
         'Block_Finder\\Enqueues' => __DIR__ . '/../..' . '/classes/class-enqueues.php',
         'Block_Finder\\Plugin_Paths' => __DIR__ . '/../..' . '/classes/class-plugin-paths.php',

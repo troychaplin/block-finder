@@ -23,6 +23,7 @@ Prefix the change with one of these keywords:
 -   Post-type-aware result heading that pluralises the type label (e.g. "Paragraph block has been found in 12 pages")
 -   Locale-aware number formatting via `number_format_i18n()` so large counts render correctly (e.g. "2,345")
 -   Post-status filter on the dashboard form: searches default to Published only, but the user can include Draft, Pending, Scheduled, and Private content. Non-published results display a status badge in the meta line, and the cache key partitions by status set so searches with different status selections don't collide
+-   `wp block-finder search` WP-CLI command. Same engine as the dashboard, gated only by CLI access (no REST permission check). Supports `--post-type`, `--post-status`, `--filter=all|nested`, `--format=table|json|csv|count|ids`, `--fields`. Useful for CI checks (`--format=count`), batch operations (`--format=ids | xargs ...`), and audit exports (`--format=csv > report.csv`)
 
 ### Changed
 

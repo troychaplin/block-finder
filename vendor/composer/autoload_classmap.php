@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Block_Finder\\CLI_Command' => $baseDir . '/classes/class-cli-command.php',
     'Block_Finder\\Dashboard' => $baseDir . '/classes/class-dashboard.php',
     'Block_Finder\\Enqueues' => $baseDir . '/classes/class-enqueues.php',
     'Block_Finder\\Plugin_Paths' => $baseDir . '/classes/class-plugin-paths.php',

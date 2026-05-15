@@ -5,14 +5,13 @@ user value, a UX sketch, the technical approach in prose, edge cases worth remem
 and a scope cut between the first version and possible follow-ups. No code here — this
 is for alignment before implementation.
 
-The two features below share a backbone: the `Search_Service` class (`classes/class-search-service.php`) now owns the query + parse + cache pipeline that the REST search endpoint already delegates to. Both new features should plug into the same service rather than re-implementing any of it.
+The feature below plugs into `Search_Service` (`classes/class-search-service.php`), which owns the query + parse + cache pipeline used by both the REST endpoint and the WP-CLI command. New search sources should extend the service rather than running queries themselves.
 
 ---
 
 ## Table of contents
 
 1. [Block search in theme templates and reusable blocks](#block-search-in-theme-templates-and-reusable-blocks)
-2. [WP-CLI command](#wp-cli-command)
 
 ---
 
@@ -95,98 +94,22 @@ patterns are out of scope; they aren't block markup in the same shape.
 
 ---
 
-## WP-CLI command
-
-### Summary
-
-Expose Block Finder's search functionality as a `wp block-finder` command set, so
-developers can script audits, CI checks, and batch migrations against the same engine
-the dashboard uses.
-
-### Why
-
-The dashboard widget is great for ad-hoc questions but useless inside a deployment
-pipeline. Plugin / theme upgrades are exactly when "is this deprecated block still in
-use?" matters most, and a CLI command makes that check trivial to wire into CI or
-into a migration script.
-
-The CLI command also gives agencies and consultants a way to bundle the plugin into
-their workflow without ever having to surface its UI to clients.
-
-### UX (developer-facing)
-
-The command suite registers under the `block-finder` namespace:
-
-- `wp block-finder search <block> [--post-type=<slug>] [--post-status=<list>]
-  [--sources=<list>] [--filter=<all|nested>] [--format=<table|json|csv|count|ids>]
-  [--fields=<list>]`
-  - Returns the same data the dashboard sees: post IDs, titles, edit links, total
-    instances, nested instances.
-  - `--format=count` short-circuits to a single integer for easy `if [ $(...) -gt 0 ]`
-    use.
-  - `--format=ids` returns just the matching IDs, one per line, for piping into
-    `xargs wp post update ...` or similar.
-- `wp block-finder list-blocks` — print every registered block with its title and a
-  hint of whether it's currently used anywhere (helps with deprecation audits).
-
-Examples:
-
-```
-wp block-finder search core/paragraph
-wp block-finder search core/group --sources=posts,templates --format=csv > usage.csv
-wp block-finder search my-plugin/deprecated --format=count
-```
-
-Output formatting follows the WP-CLI convention via `WP_CLI\Utils\format_items()`.
-
-### Technical approach
-
-- New file `classes/class-cli-command.php`, registered only when `defined('WP_CLI')`.
-- The command class is thin: it parses args, calls the shared Search service, and
-  formats output. No duplication of query / parse / render logic.
-- Permission model: CLI commands run as a system process and skip the
-  `current_user_can('edit_posts')` gate. The CLI itself is the auth boundary. This
-  matches how core's `wp post list` behaves.
-- Bootstrap: gated registration in the main plugin file. `WP_CLI::add_command()` is
-  called only when `defined('WP_CLI') && WP_CLI`.
-
-### Edge cases
-
-- Very large result sets: the existing search returns the full result array which
-  could be heavy on huge sites. The CLI command should warn at a threshold (e.g.
-  10,000 matches) and offer `--limit` / `--offset`. Or stream via a generator
-  iteration if we extract the search to a service that supports it.
-- The `--sources=templates` path requires that templates and reusable blocks work
-  first — gated on the previous feature shipping.
-- Test coverage: `WP_CLI::add_command` calls are loaded in CLI context only, so we
-  test against the underlying service class rather than the command directly.
-
-### Scope
-
-**v1 ships with**: `wp block-finder search` with all relevant flags and standard
-output formats.
-
-**Deferred**: `wp block-finder list-blocks` (nice but not strictly needed for v1).
-`wp block-finder replace` (out of scope — too much blast radius). Streaming for very
-large sites.
-
----
-
 ## Notes for implementers
 
 The `Search_Service` class (`classes/class-search-service.php`) is the entry
-point both new features should use. Relevant surface:
+point for the remaining feature. Relevant surface:
 
 - `search( $block, $post_type, $post_status )` — runs query + parse, returns the
-  same result shape the REST endpoint and dashboard renderer expect (`id`,
-  `title`, `status`, `edit_link`, `view_link`, `block_instances`). Reads/writes
-  the transient cache transparently.
+  same result shape the REST endpoint, dashboard renderer, and CLI command
+  expect (`id`, `title`, `status`, `edit_link`, `view_link`, `block_instances`).
+  Reads/writes the transient cache transparently.
 - `invalidate_cache_for_post( $post_id, $post )` — hook target wired up by
   `init()` for `save_post`, `delete_post`, `wp_trash_post`, and
-  `untrashed_post`. Both new features can reuse it as-is.
+  `untrashed_post`. Reuse it as-is when adding new sources.
 - Constants `CACHE_PREFIX` and `CACHE_EXPIRATION` live on the service.
 
-The templates feature will likely add a `sources` parameter to `search()` and
-branch internally between `database_search()` (existing) and a new
-`templates_search()` path that uses `get_block_templates()`. The CLI command
-should instantiate the service directly and bypass the HTTP layer entirely.
+The templates feature should add a `sources` parameter to `search()` and branch
+internally between `database_search()` (existing) and a new path that uses
+`get_block_templates()`. The CLI command (`classes/class-cli-command.php`) and
+the REST controller will both pick the new sources up automatically — they
+already pass everything received through to the service.
