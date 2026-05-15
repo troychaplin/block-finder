@@ -461,13 +461,13 @@ class REST_Controller extends WP_REST_Controller {
 				</span>
 				<span class="block-finder-page-buttons">
 					<?php if ( $page > 1 ) : ?>
-						<button type="button" class="button block-finder-prev" data-page="<?php echo esc_attr( (string) ( $page - 1 ) ); ?>">
-							<?php esc_html_e( 'Previous', 'block-finder' ); ?>
+						<button type="button" class="block-finder-page-link block-finder-prev" data-page="<?php echo esc_attr( (string) ( $page - 1 ) ); ?>">
+							<?php esc_html_e( '‹ Previous', 'block-finder' ); ?>
 						</button>
 					<?php endif; ?>
 					<?php if ( $page < $total_pages ) : ?>
-						<button type="button" class="button block-finder-next" data-page="<?php echo esc_attr( (string) ( $page + 1 ) ); ?>">
-							<?php esc_html_e( 'Next', 'block-finder' ); ?>
+						<button type="button" class="block-finder-page-link block-finder-next" data-page="<?php echo esc_attr( (string) ( $page + 1 ) ); ?>">
+							<?php esc_html_e( 'Next ›', 'block-finder' ); ?>
 						</button>
 					<?php endif; ?>
 				</span>
