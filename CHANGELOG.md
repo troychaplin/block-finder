@@ -24,6 +24,7 @@ Prefix the change with one of these keywords:
 -   Locale-aware number formatting via `number_format_i18n()` so large counts render correctly (e.g. "2,345")
 -   Post-status filter on the dashboard form: searches default to Published only, but the user can include Draft, Pending, Scheduled, and Private content. Non-published results display a status badge in the meta line, and the cache key partitions by status set so searches with different status selections don't collide
 -   `wp block-finder search` WP-CLI command. Same engine as the dashboard, gated only by CLI access (no REST permission check). Supports `--post-type`, `--post-status`, `--filter=all|nested`, `--format=table|json|csv|count|ids`, `--fields`. Useful for CI checks (`--format=count`), batch operations (`--format=ids | xargs ...`), and audit exports (`--format=csv > report.csv`)
+-   New "Search in" control on the dashboard form. Searches default to Posts (current behaviour), but can additionally include Reusable blocks, and — on block themes — Templates and Template parts (file-based + DB-stored). Each result row shows a source/type badge in the meta line, the result-list heading adapts to the scope ("12 templates", "5 entries" when mixed, etc.), and edit links route to the Site Editor for templates/parts. CLI mirrors via `--sources=posts,reusable_blocks,templates,parts`. Template / part / reusable-block changes flush the entire search cache (since they can appear in any cross-source search); `switch_theme` does the same to cover file-based template churn
 
 ### Changed
 

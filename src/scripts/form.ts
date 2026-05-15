@@ -316,6 +316,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			form.querySelectorAll<HTMLInputElement>('input[name="post_status[]"]:checked')
 		).map(input => input.value);
 
+		const checkedSources = Array.from(
+			form.querySelectorAll<HTMLInputElement>('input[name="sources[]"]:checked')
+		).map(input => input.value);
+
 		const params = new URLSearchParams();
 		params.append('block', block);
 		params.append('post_type', postType);
@@ -323,6 +327,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		params.append('filter', filter);
 		for (const status of checkedStatuses) {
 			params.append('post_status[]', status);
+		}
+		for (const source of checkedSources) {
+			params.append('sources[]', source);
 		}
 
 		try {

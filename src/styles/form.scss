@@ -15,7 +15,8 @@
 	padding-bottom: 16px;
 }
 
-// Post-status filter group
+// Filter groups (sources + statuses share the same shape)
+.block-finder-sources,
 .block-finder-statuses {
 	border: 1px solid #c3c4c7;
 	border-radius: 3px;
@@ -23,6 +24,7 @@
 	margin: 0 0 16px;
 }
 
+.block-finder-sources legend,
 .block-finder-statuses legend {
 	color: #2c3338;
 	font-size: 13px;
@@ -30,6 +32,7 @@
 	padding: 0 4px;
 }
 
+.block-finder-source-option,
 .block-finder-status-option {
 	align-items: center;
 	color: #2c3338;
@@ -39,6 +42,7 @@
 	margin-right: 12px;
 }
 
+.block-finder-source-option input[type='checkbox'],
 .block-finder-status-option input[type='checkbox'] {
 	margin: 0;
 }
@@ -333,7 +337,8 @@
 	align-items: center;
 	flex-shrink: 0;
 
-	a:last-child {
+	// Only add the divider when there are two action links (Edit + View).
+	a + a {
 		border-left: 1px solid #b9b9b9;
 		padding-left: 8px;
 	}

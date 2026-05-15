@@ -107,6 +107,15 @@ class REST_Controller extends WP_REST_Controller {
 				),
 				'default'     => array( 'publish' ),
 			),
+			'sources'     => array(
+				'description' => __( 'Where to search. Templates and parts require a block theme.', 'block-finder' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'posts', 'reusable_blocks', 'templates', 'parts' ),
+				),
+				'default'     => array( 'posts' ),
+			),
 		);
 	}
 
@@ -140,13 +149,19 @@ class REST_Controller extends WP_REST_Controller {
 		$page        = (int) $request->get_param( 'page' );
 		$filter      = $request->get_param( 'filter' );
 		$post_status = (array) $request->get_param( 'post_status' );
+		$sources     = (array) $request->get_param( 'sources' );
 
-		$results = $this->search_service->search( $block, $post_type, $post_status );
+		// Site Editor sources require theme-level edit caps. Drop them silently for users without.
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			$sources = array_values( array_diff( $sources, array( 'templates', 'parts' ) ) );
+		}
+
+		$results = $this->search_service->search( $block, $post_type, $post_status, $sources );
 
 		if ( empty( $results ) ) {
 			$html = $this->render_no_results( $block, $post_type );
 		} else {
-			$html = $this->render_results( $results, $block, $post_type, $page, $filter );
+			$html = $this->render_results( $results, $block, $post_type, $page, $filter, $sources );
 		}
 
 		return rest_ensure_response(
@@ -194,14 +209,15 @@ class REST_Controller extends WP_REST_Controller {
 	/**
 	 * Render the results list with pagination and filter links.
 	 *
-	 * @param array  $results   Posts found.
-	 * @param string $block     Block name searched for.
-	 * @param string $post_type Post type slug or "all".
-	 * @param int    $page      Current page.
-	 * @param string $filter    "all" or "nested".
+	 * @param array    $results   Posts found.
+	 * @param string   $block     Block name searched for.
+	 * @param string   $post_type Post type slug or "all".
+	 * @param int      $page      Current page.
+	 * @param string   $filter    "all" or "nested".
+	 * @param string[] $sources   Sources included in the search.
 	 * @return string
 	 */
-	private function render_results( $results, $block, $post_type, $page, $filter ) {
+	private function render_results( $results, $block, $post_type, $page, $filter, $sources ) {
 		$all_count    = count( $results );
 		$nested_count = 0;
 
@@ -236,15 +252,15 @@ class REST_Controller extends WP_REST_Controller {
 		$offset        = ( $page - 1 ) * self::RESULTS_PER_PAGE;
 		$paged_results = array_slice( $results, $offset, self::RESULTS_PER_PAGE );
 
-		$block_label     = ucwords( str_replace( '-', ' ', str_replace( 'core/', '', $block ) ) );
-		$post_type_label = $this->get_post_type_label_for_count( $post_type, $total_results );
+		$block_label = ucwords( str_replace( '-', ' ', str_replace( 'core/', '', $block ) ) );
+		$scope_label = $this->get_result_scope_label( $sources, $post_type, $total_results );
 
 		$heading = sprintf(
-			/* translators: 1: block name, 2: formatted number of matches, 3: post type label (pluralised for count) */
+			/* translators: 1: block name, 2: formatted number of matches, 3: scope label (pluralised for count) */
 			__( '%1$s block has been found in %2$s %3$s', 'block-finder' ),
 			$block_label,
 			number_format_i18n( $total_results ),
-			$post_type_label
+			$scope_label
 		);
 
 		ob_start();
@@ -280,14 +296,20 @@ class REST_Controller extends WP_REST_Controller {
 					}
 				}
 				$status_label = $this->get_status_label( $result['status'] ?? 'publish' );
+				$source_label = $this->get_source_label_for_result( $result );
 				?>
 				<li
+					data-source="<?php echo esc_attr( $result['source'] ?? 'post' ); ?>"
 					<?php echo $has_root ? ' data-has-root="1"' : ''; ?>
 					<?php echo $nested_instances > 0 ? ' data-has-nested="1"' : ''; ?>
 				>
 					<div class="block-finder-result-content">
 						<span class="block-finder-result-title"><?php echo esc_html( $result['title'] ); ?></span>
 						<span class="block-finder-meta">
+							<?php if ( $source_label ) : ?>
+								<span class="block-finder-meta-item block-finder-meta-source"><?php echo esc_html( $source_label ); ?></span>
+								<span class="block-finder-meta-sep" aria-hidden="true">|</span>
+							<?php endif; ?>
 							<span class="block-finder-meta-item">
 								<?php
 								/* translators: %s: number of block instances in this post */
@@ -313,7 +335,9 @@ class REST_Controller extends WP_REST_Controller {
 					</div>
 					<span class="block-finder-result-actions">
 						<a href="<?php echo esc_url( $result['edit_link'] ); ?>"><?php esc_html_e( 'Edit', 'block-finder' ); ?></a>
-						<a href="<?php echo esc_url( $result['view_link'] ); ?>"><?php esc_html_e( 'View', 'block-finder' ); ?></a>
+						<?php if ( ! empty( $result['view_link'] ) ) : ?>
+							<a href="<?php echo esc_url( $result['view_link'] ); ?>"><?php esc_html_e( 'View', 'block-finder' ); ?></a>
+						<?php endif; ?>
 					</span>
 				</li>
 			<?php endforeach; ?>
@@ -342,6 +366,60 @@ class REST_Controller extends WP_REST_Controller {
 		<?php endif; ?>
 		<?php
 		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Pluralised label for the heading sentence, scoped to the search sources.
+	 *
+	 * Single-source searches use a source-specific noun (pages / templates / template
+	 * parts / reusable blocks). Cross-source searches use "entries" / "entry".
+	 *
+	 * @param string[] $sources   Sources included in the search.
+	 * @param string   $post_type Post type slug or "all" (only used for the "posts" source).
+	 * @param int      $count     Match count.
+	 * @return string
+	 */
+	private function get_result_scope_label( $sources, $post_type, $count ) {
+		if ( 1 === count( $sources ) ) {
+			switch ( $sources[0] ) {
+				case 'posts':
+					return $this->get_post_type_label_for_count( $post_type, $count );
+				case 'templates':
+					return _n( 'template', 'templates', $count, 'block-finder' );
+				case 'parts':
+					return _n( 'template part', 'template parts', $count, 'block-finder' );
+				case 'reusable_blocks':
+					return _n( 'reusable block', 'reusable blocks', $count, 'block-finder' );
+			}
+		}
+
+		return _n( 'entry', 'entries', $count, 'block-finder' );
+	}
+
+	/**
+	 * Short per-result badge label ("Page", "Template", "Reusable block", etc.).
+	 *
+	 * @param array $result Single result row.
+	 * @return string
+	 */
+	private function get_source_label_for_result( $result ) {
+		$source = $result['source'] ?? 'post';
+
+		switch ( $source ) {
+			case 'template':
+				return __( 'Template', 'block-finder' );
+			case 'part':
+				return __( 'Template part', 'block-finder' );
+			case 'reusable_block':
+				return __( 'Reusable block', 'block-finder' );
+			case 'post':
+			default:
+				$obj = get_post_type_object( $result['post_type'] ?? '' );
+				if ( $obj && isset( $obj->labels->singular_name ) ) {
+					return $obj->labels->singular_name;
+				}
+				return ucfirst( (string) ( $result['post_type'] ?? '' ) );
+		}
 	}
 
 	/**

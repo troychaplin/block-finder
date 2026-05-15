@@ -77,6 +77,31 @@ class Dashboard {
 				<?php endforeach; ?>
 			</select>
 
+			<fieldset class="block-finder-sources">
+				<legend><?php esc_html_e( 'Search in', 'block-finder' ); ?></legend>
+				<?php
+				$source_options = array(
+					'posts'           => __( 'Posts', 'block-finder' ),
+					'reusable_blocks' => __( 'Reusable blocks', 'block-finder' ),
+				);
+				if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+					$source_options['templates'] = __( 'Templates', 'block-finder' );
+					$source_options['parts']     = __( 'Template parts', 'block-finder' );
+				}
+				foreach ( $source_options as $value => $label ) :
+					?>
+					<label class="block-finder-source-option">
+						<input
+							type="checkbox"
+							name="sources[]"
+							value="<?php echo esc_attr( $value ); ?>"
+							<?php checked( 'posts', $value ); ?>
+						/>
+						<?php echo esc_html( $label ); ?>
+					</label>
+				<?php endforeach; ?>
+			</fieldset>
+
 			<fieldset class="block-finder-statuses">
 				<legend><?php esc_html_e( 'Post status', 'block-finder' ); ?></legend>
 				<?php

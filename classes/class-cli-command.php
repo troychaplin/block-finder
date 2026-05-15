@@ -32,11 +32,18 @@ class CLI_Command {
 	private const ALLOWED_STATUSES = array( 'publish', 'draft', 'pending', 'future', 'private' );
 
 	/**
+	 * Allowed search sources (matches the REST endpoint enum).
+	 *
+	 * @var string[]
+	 */
+	private const ALLOWED_SOURCES = array( 'posts', 'reusable_blocks', 'templates', 'parts' );
+
+	/**
 	 * Default columns for table / CSV output.
 	 *
 	 * @var string
 	 */
-	private const DEFAULT_FIELDS = 'id,title,status,count,nested,url';
+	private const DEFAULT_FIELDS = 'id,title,source,status,count,nested,url';
 
 	/**
 	 * Constructor.
@@ -67,6 +74,12 @@ class CLI_Command {
 	 * default: publish
 	 * ---
 	 *
+	 * [--sources=<list>]
+	 * : Comma-separated sources to search. Allowed: posts, reusable_blocks, templates, parts. Templates and parts require a block theme.
+	 * ---
+	 * default: posts
+	 * ---
+	 *
 	 * [--filter=<filter>]
 	 * : Only return posts with at least one nested (InnerBlock) instance when set to "nested".
 	 * ---
@@ -89,7 +102,7 @@ class CLI_Command {
 	 * ---
 	 *
 	 * [--fields=<list>]
-	 * : Comma-separated list of fields for table/csv/json output. Available: id, title, status, count, nested, url.
+	 * : Comma-separated list of fields for table/csv/json output. Available: id, title, source, status, count, nested, url.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -108,6 +121,9 @@ class CLI_Command {
 	 *     # Search across drafts too
 	 *     $ wp block-finder search core/cover --post-status=publish,draft
 	 *
+	 *     # Include block-theme templates and reusable blocks in the search
+	 *     $ wp block-finder search core/heading --sources=posts,templates,parts,reusable_blocks
+	 *
 	 * @when after_wp_load
 	 *
 	 * @param array $args       Positional arguments (block name).
@@ -120,8 +136,9 @@ class CLI_Command {
 		$format     = (string) ( $assoc_args['format'] ?? 'table' );
 		$fields_arg = (string) ( $assoc_args['fields'] ?? self::DEFAULT_FIELDS );
 		$statuses   = $this->parse_status_list( (string) ( $assoc_args['post-status'] ?? 'publish' ) );
+		$sources    = $this->parse_sources_list( (string) ( $assoc_args['sources'] ?? 'posts' ) );
 
-		$results = $this->search_service->search( $block, $post_type, $statuses );
+		$results = $this->search_service->search( $block, $post_type, $statuses, $sources );
 
 		if ( 'nested' === $filter ) {
 			$results = array_values(
@@ -175,11 +192,43 @@ class CLI_Command {
 		return array(
 			'id'     => $result['id'],
 			'title'  => $result['title'],
+			'source' => $result['source'] ?? 'post',
 			'status' => $result['status'],
 			'count'  => $total,
 			'nested' => $nested,
 			'url'    => $result['edit_link'],
 		);
+	}
+
+	/**
+	 * Parse a comma-separated sources list, erroring on any value that's not in the allowed set.
+	 *
+	 * @param string $raw Comma-separated sources.
+	 * @return string[]
+	 */
+	private function parse_sources_list( $raw ) {
+		$requested = array_values(
+			array_filter(
+				array_map( 'trim', explode( ',', $raw ) )
+			)
+		);
+
+		if ( empty( $requested ) ) {
+			return array( 'posts' );
+		}
+
+		$invalid = array_diff( $requested, self::ALLOWED_SOURCES );
+		if ( ! empty( $invalid ) ) {
+			WP_CLI::error(
+				sprintf(
+					'Unknown source(s): %s. Allowed: %s.',
+					implode( ', ', $invalid ),
+					implode( ', ', self::ALLOWED_SOURCES )
+				)
+			);
+		}
+
+		return $requested;
 	}
 
 	/**
