@@ -31,6 +31,9 @@ if ( ! class_exists( Block_Finder\Plugin_Paths::class ) ) {
 	return;
 }
 
+$block_finder_search_service = new Block_Finder\Search_Service();
+$block_finder_search_service->init();
+
 ( new Block_Finder\Enqueues( __DIR__ . '/build' ) )->init();
 ( new Block_Finder\Dashboard() )->init();
-( new Block_Finder\REST_Controller() )->init();
+( new Block_Finder\REST_Controller( $block_finder_search_service ) )->init();

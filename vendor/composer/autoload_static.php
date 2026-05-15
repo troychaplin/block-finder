@@ -25,6 +25,7 @@ class ComposerStaticInitbe4768179afec99e6e27eb5d01bc7e98
         'Block_Finder\\Enqueues' => __DIR__ . '/../..' . '/classes/class-enqueues.php',
         'Block_Finder\\Plugin_Paths' => __DIR__ . '/../..' . '/classes/class-plugin-paths.php',
         'Block_Finder\\REST_Controller' => __DIR__ . '/../..' . '/classes/class-rest-controller.php',
+        'Block_Finder\\Search_Service' => __DIR__ . '/../..' . '/classes/class-search-service.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'PHPCSUtils\\AbstractSniffs\\AbstractArrayDeclarationSniff' => __DIR__ . '/..' . '/phpcsstandards/phpcsutils/PHPCSUtils/AbstractSniffs/AbstractArrayDeclarationSniff.php',
         'PHPCSUtils\\BackCompat\\BCFile' => __DIR__ . '/..' . '/phpcsstandards/phpcsutils/PHPCSUtils/BackCompat/BCFile.php',

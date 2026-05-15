@@ -26,6 +26,7 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+-   Extracted the query + parse + cache pipeline out of `REST_Controller` into a new `Search_Service` class. No user-facing behaviour change; the REST endpoint delegates to the service via `search()`, and the `save_post` / `delete_post` / trash hooks are now owned by the service. Sets up clean entry points for the WP-CLI and templates features still pending in [FEATURES.md](FEATURES.md)
 -   Bumped minimum WordPress to 6.4 and minimum PHP to 8.0
 -   Clicking an already-populated autocomplete input now clears it and shows the full list; blur restores the previous value if no pick is made
 -   Renamed "InnerBlocks (N)" filter toggle to "Innerblocks (N)"; per-row indicator renamed to "As Innerblock: N"
