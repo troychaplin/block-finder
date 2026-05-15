@@ -312,12 +312,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		submitButton.textContent = 'Searching...';
 		resultsContainer.innerHTML = createLoadingSkeleton();
 
-		const params = new URLSearchParams({
-			block,
-			post_type: postType,
-			page: page.toString(),
-			filter,
-		});
+		const checkedStatuses = Array.from(
+			form.querySelectorAll<HTMLInputElement>('input[name="post_status[]"]:checked')
+		).map(input => input.value);
+
+		const params = new URLSearchParams();
+		params.append('block', block);
+		params.append('post_type', postType);
+		params.append('page', page.toString());
+		params.append('filter', filter);
+		for (const status of checkedStatuses) {
+			params.append('post_status[]', status);
+		}
 
 		try {
 			const data = await apiFetch<SearchResponse>({
