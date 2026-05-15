@@ -28,7 +28,7 @@ Prefix the change with one of these keywords:
 -   Bumped minimum WordPress to 6.4 and minimum PHP to 8.0
 -   Clicking an already-populated autocomplete input now clears it and shows the full list; blur restores the previous value if no pick is made
 -   Renamed "InnerBlocks (N)" filter toggle to "Innerblocks (N)"; per-row indicator renamed to "As Innerblock: N"
--   Replaced `wp_localize_script()` with `wp_add_inline_script()` using `JSON_HEX_TAG | JSON_UNESCAPED_SLASHES`
+-   Switched the dashboard front-end from native `fetch()` to `@wordpress/api-fetch`; WordPress core now wires the REST root URL and `X-WP-Nonce` middleware automatically
 -   Cache invalidation is now surgical: only transients for the affected post type are flushed, autosaves and revisions are skipped, and trash/untrash transitions are covered
 -   Modernised PHP class structure: dropped the `tc_` method prefix, adopted PHP 8 nullsafe operators, replaced the `Plugin_Module` abstract with direct instantiation
 -   Migrated ESLint to flat config (`eslint.config.cjs`); bumped `@wordpress/scripts` 31→32, `@wordpress/eslint-plugin` 24→25, `@wordpress/env` 10→11, `typescript` 5→6
@@ -40,6 +40,7 @@ Prefix the change with one of these keywords:
 -   `Plugin_Module` abstract class
 -   Italic "Parent: X" context line under each result row (subsumed by the new Count / As Innerblock totals)
 -   `.prettierrc.js` (dead — `.prettierrc` JSON wins by priority)
+-   `wp_localize_script()` / inline-script bootstrap that exposed `window.blockFinder` (no longer needed once `wp-api-fetch` is a script dependency)
 
 ### Fixed
 

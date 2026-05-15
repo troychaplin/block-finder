@@ -1,12 +1,9 @@
-/**
- * Bootstrapped server config: REST endpoint URL and a wp_rest nonce.
- */
-interface BlockFinderConfig {
-	restUrl: string;
-	nonce: string;
-}
+import apiFetch from '@wordpress/api-fetch';
 
-declare const blockFinder: BlockFinderConfig;
+interface SearchResponse {
+	html: string;
+	total: number;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('block-finder-form') as HTMLFormElement | null;
@@ -323,28 +320,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		try {
-			const response = await fetch(`${blockFinder.restUrl}?${params.toString()}`, {
+			const data = await apiFetch<SearchResponse>({
+				path: `/block-finder/v1/search?${params.toString()}`,
 				method: 'GET',
-				headers: {
-					'X-WP-Nonce': blockFinder.nonce,
-					Accept: 'application/json',
-				},
 			});
+			resultsContainer.innerHTML = data.html;
 
-			if (response.ok) {
-				const data = (await response.json()) as { html: string; total: number };
-				resultsContainer.innerHTML = data.html;
-
-				// Attach event listeners.
-				attachPaginationListeners();
-				attachFilterListeners();
-			} else {
-				const errorData = (await response.json()) as { message?: string };
-				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message ?? response.statusText}</p>`;
-			}
+			// Attach event listeners.
+			attachPaginationListeners();
+			attachFilterListeners();
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-			resultsContainer.innerHTML = `<p>An error occurred: ${errorMessage}</p>`;
+			const message = (error as { message?: string })?.message ?? 'Unknown error';
+			resultsContainer.innerHTML = `<p>An error occurred: ${message}</p>`;
 		} finally {
 			submitButton.disabled = false;
 			submitButton.textContent = 'Find Block';

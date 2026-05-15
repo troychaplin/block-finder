@@ -8,7 +8,9 @@
 namespace Block_Finder;
 
 /**
- * Enqueues the dashboard CSS/JS and bootstraps the REST URL + nonce for the front-end.
+ * Enqueues the dashboard CSS/JS. REST URL + nonce are provided automatically by
+ * the `wp-api-fetch` script dependency that `@wordpress/scripts` injects into
+ * the generated asset.php.
  */
 class Enqueues {
 
@@ -49,10 +51,13 @@ class Enqueues {
 			return;
 		}
 
+		// Note: `$asset_meta['dependencies']` is a list of *script* handles
+		// extracted by @wordpress/scripts. They aren't valid style handles, so
+		// the style enqueue takes an empty deps array.
 		wp_enqueue_style(
 			'block-finder-css',
 			$this->build_dir->get_url( 'block-finder.css' ),
-			$asset_meta['dependencies'],
+			array(),
 			$asset_meta['version'],
 			false
 		);
@@ -64,20 +69,5 @@ class Enqueues {
 			$asset_meta['version'],
 			false
 		);
-
-		// Provide the REST URL and a wp_rest nonce to the front-end.
-		// In Phase 3 this becomes unnecessary once `@wordpress/api-fetch` is wired up.
-		$bootstrap = sprintf(
-			'window.blockFinder = %s;',
-			wp_json_encode(
-				array(
-					'restUrl' => esc_url_raw( rest_url( 'block-finder/v1/search' ) ),
-					'nonce'   => wp_create_nonce( 'wp_rest' ),
-				),
-				JSON_HEX_TAG | JSON_UNESCAPED_SLASHES
-			)
-		);
-
-		wp_add_inline_script( 'block-finder-js', $bootstrap, 'before' );
 	}
 }
