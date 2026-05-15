@@ -280,19 +280,22 @@
 	color: #1d2327;
 }
 
-// Context indicators
-.block-finder-context {
+// Per-result meta line: instance count + nested count
+.block-finder-meta {
 	display: flex;
+	align-items: center;
 	flex-wrap: wrap;
-	gap: 6px;
-	margin-left: 0 !important;
+	gap: 8px;
+	font-size: 12px;
+	color: #50575e;
 }
 
-.context-nested {
-	font-size: 11px;
-	font-style: italic;
-	color: #50575e;
-	padding: 2px 0;
+.block-finder-meta-item {
+	white-space: nowrap;
+}
+
+.block-finder-meta-sep {
+	color: #c3c4c7;
 }
 
 // Result actions
@@ -318,13 +321,6 @@
 // 		text-decoration: underline;
 // 	}
 // }
-
-// Results count badge
-.block-finder-count {
-	font-weight: 400;
-	color: #646970;
-	font-size: 13px;
-}
 
 // Pagination styles
 .block-finder-pagination {

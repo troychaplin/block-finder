@@ -16,6 +16,39 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+-   REST API endpoint `GET /wp-json/block-finder/v1/search` for block search queries
+-   Per-result row showing total instances of the block in each post, and how many appear as Innerblocks
+-   Post-type-aware result heading that pluralises the type label (e.g. "Paragraph block has been found in 12 pages")
+-   Locale-aware number formatting via `number_format_i18n()` so large counts render correctly (e.g. "2,345")
+
+### Changed
+
+-   Bumped minimum WordPress to 6.4 and minimum PHP to 8.0
+-   Clicking an already-populated autocomplete input now clears it and shows the full list; blur restores the previous value if no pick is made
+-   Renamed "InnerBlocks (N)" filter toggle to "Innerblocks (N)"; per-row indicator renamed to "As Innerblock: N"
+-   Replaced `wp_localize_script()` with `wp_add_inline_script()` using `JSON_HEX_TAG | JSON_UNESCAPED_SLASHES`
+-   Cache invalidation is now surgical: only transients for the affected post type are flushed, autosaves and revisions are skipped, and trash/untrash transitions are covered
+-   Modernised PHP class structure: dropped the `tc_` method prefix, adopted PHP 8 nullsafe operators, replaced the `Plugin_Module` abstract with direct instantiation
+-   Migrated ESLint to flat config (`eslint.config.cjs`); bumped `@wordpress/scripts` 31→32, `@wordpress/eslint-plugin` 24→25, `@wordpress/env` 10→11, `typescript` 5→6
+-   Bumped `tsconfig.json` target to `esnext`
+
+### Removed
+
+-   Legacy `admin-ajax.php` handler in favour of the REST endpoint
+-   `Plugin_Module` abstract class
+-   Italic "Parent: X" context line under each result row (subsumed by the new Count / As Innerblock totals)
+-   `.prettierrc.js` (dead — `.prettierrc` JSON wins by priority)
+
+### Fixed
+
+-   Guarded against a fatal error when `get_post_type_object()` returns `null` for the supplied post type slug
+
+### Security
+
+-   REST endpoint enforces `current_user_can( 'edit_posts' )` via `permission_callback` and returns `WP_Error` on denial (previously a nonce-only check)
+
 ## [1.0.7]
 
 ### Added

@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Define plugin version.
 define( 'BLOCK_FINDER_VERSION', '1.0.7' );
 
-// Include our bundled autoload if not loaded globally.
+// Load the bundled Composer autoloader if it hasn't been provided already.
 if ( ! class_exists( Block_Finder\Plugin_Paths::class ) && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
@@ -31,14 +31,6 @@ if ( ! class_exists( Block_Finder\Plugin_Paths::class ) ) {
 	return;
 }
 
-// Instantiate our modules.
-$block_finder_modules = array(
-	new Block_Finder\Enqueues( __DIR__ . '/build' ),
-	new Block_Finder\Dashboard( __DIR__ . '/build' ),
-);
-
-foreach ( $block_finder_modules as $block_finder_module ) {
-	if ( is_a( $block_finder_module, Block_Finder\Plugin_Module::class ) ) {
-		$block_finder_module->init();
-	}
-}
+( new Block_Finder\Enqueues( __DIR__ . '/build' ) )->init();
+( new Block_Finder\Dashboard() )->init();
+( new Block_Finder\REST_Controller() )->init();

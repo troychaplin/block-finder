@@ -1,12 +1,12 @@
 /**
- * Block Finder Ajax global object interface.
+ * Bootstrapped server config: REST endpoint URL and a wp_rest nonce.
  */
-interface BlockFinderAjax {
-	ajax_url: string;
+interface BlockFinderConfig {
+	restUrl: string;
 	nonce: string;
 }
 
-declare const blockFinderAjax: BlockFinderAjax;
+declare const blockFinder: BlockFinderConfig;
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('block-finder-form') as HTMLFormElement | null;
@@ -144,8 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			showFilteredOptions();
 		});
 
-		// Focus event - show all options
+		// Focus event - clear any current selection so the full list is shown.
+		// The blur handler restores the previous value if no new pick is made.
 		autocompleteInput.addEventListener('focus', () => {
+			if (selectElement.value) {
+				autocompleteInput.value = '';
+			}
 			showFilteredOptions();
 		});
 
@@ -311,33 +315,32 @@ document.addEventListener('DOMContentLoaded', () => {
 		submitButton.textContent = 'Searching...';
 		resultsContainer.innerHTML = createLoadingSkeleton();
 
-		const data = new URLSearchParams();
-		data.append('action', 'find_blocks');
-		data.append('post_type', postType);
-		data.append('block', block);
-		data.append('page', page.toString());
-		data.append('filter', filter);
-		data.append('nonce', blockFinderAjax.nonce);
+		const params = new URLSearchParams({
+			block,
+			post_type: postType,
+			page: page.toString(),
+			filter,
+		});
 
 		try {
-			const response = await fetch(blockFinderAjax.ajax_url, {
-				method: 'POST',
+			const response = await fetch(`${blockFinder.restUrl}?${params.toString()}`, {
+				method: 'GET',
 				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+					'X-WP-Nonce': blockFinder.nonce,
+					Accept: 'application/json',
 				},
-				body: data.toString(),
 			});
 
 			if (response.ok) {
-				const responseText = await response.text();
-				resultsContainer.innerHTML = responseText;
+				const data = (await response.json()) as { html: string; total: number };
+				resultsContainer.innerHTML = data.html;
 
 				// Attach event listeners.
 				attachPaginationListeners();
 				attachFilterListeners();
 			} else {
-				const errorData = await response.json();
-				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message}</p>`;
+				const errorData = (await response.json()) as { message?: string };
+				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message ?? response.statusText}</p>`;
 			}
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
