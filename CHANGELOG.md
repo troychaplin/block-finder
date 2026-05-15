@@ -22,6 +22,7 @@ Prefix the change with one of these keywords:
 -   Per-result row showing total instances of the block in each post, and how many appear as Innerblocks
 -   Post-type-aware result heading that pluralises the type label (e.g. "Paragraph block has been found in 12 pages")
 -   Locale-aware number formatting via `number_format_i18n()` so large counts render correctly (e.g. "2,345")
+-   Post-status filter on the dashboard form: searches default to Published only, but the user can include Draft, Pending, Scheduled, and Private content. Non-published results display a status badge in the meta line, and the cache key partitions by status set so searches with different status selections don't collide
 
 ### Changed
 

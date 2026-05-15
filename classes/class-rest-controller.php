@@ -85,29 +85,38 @@ class REST_Controller extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		return array(
-			'block'     => array(
+			'block'       => array(
 				'description'       => __( 'Block name to search for (e.g. core/paragraph).', 'block-finder' ),
 				'type'              => 'string',
 				'required'          => true,
 				'sanitize_callback' => 'sanitize_text_field',
 			),
-			'post_type' => array(
+			'post_type'   => array(
 				'description'       => __( 'Post type slug, or "all" for every editor-supporting public post type.', 'block-finder' ),
 				'type'              => 'string',
 				'required'          => true,
 				'sanitize_callback' => 'sanitize_text_field',
 			),
-			'page'      => array(
+			'page'        => array(
 				'description' => __( 'Page number for pagination.', 'block-finder' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			),
-			'filter'    => array(
+			'filter'      => array(
 				'description' => __( 'Result subset: "all" or "nested" (only posts with InnerBlocks instances).', 'block-finder' ),
 				'type'        => 'string',
 				'default'     => 'all',
 				'enum'        => array( 'all', 'nested' ),
+			),
+			'post_status' => array(
+				'description' => __( 'Post statuses to include. Defaults to published only.', 'block-finder' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'publish', 'draft', 'pending', 'future', 'private' ),
+				),
+				'default'     => array( 'publish' ),
 			),
 		);
 	}
@@ -137,16 +146,17 @@ class REST_Controller extends WP_REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function get_items( $request ) {
-		$block     = $request->get_param( 'block' );
-		$post_type = $request->get_param( 'post_type' );
-		$page      = (int) $request->get_param( 'page' );
-		$filter    = $request->get_param( 'filter' );
+		$block       = $request->get_param( 'block' );
+		$post_type   = $request->get_param( 'post_type' );
+		$page        = (int) $request->get_param( 'page' );
+		$filter      = $request->get_param( 'filter' );
+		$post_status = (array) $request->get_param( 'post_status' );
 
-		$cache_key = $this->get_cache_key( $block, $post_type );
+		$cache_key = $this->get_cache_key( $block, $post_type, $post_status );
 		$results   = get_transient( $cache_key );
 
 		if ( false === $results ) {
-			$results = $this->database_search( $block, $post_type );
+			$results = $this->database_search( $block, $post_type, $post_status );
 			set_transient( $cache_key, $results, self::CACHE_EXPIRATION );
 		}
 
@@ -167,12 +177,17 @@ class REST_Controller extends WP_REST_Controller {
 	/**
 	 * Database-level search for posts containing the given block, parsed for nesting context.
 	 *
-	 * @param string $block     Block name (e.g. core/paragraph).
-	 * @param string $post_type Post type slug or "all".
+	 * @param string   $block       Block name (e.g. core/paragraph).
+	 * @param string   $post_type   Post type slug or "all".
+	 * @param string[] $post_status Statuses to include (publish, draft, pending, future, private).
 	 * @return array
 	 */
-	private function database_search( $block, $post_type ) {
+	private function database_search( $block, $post_type, $post_status ) {
 		global $wpdb;
+
+		if ( empty( $post_status ) ) {
+			return array();
+		}
 
 		$block_name     = str_replace( 'core/', '', $block );
 		$search_pattern = '%<!-- wp:' . $wpdb->esc_like( $block_name ) . '%';
@@ -192,17 +207,18 @@ class REST_Controller extends WP_REST_Controller {
 			return array();
 		}
 
-		$placeholders = implode( ', ', array_fill( 0, count( $candidate_post_types ), '%s' ) );
+		$type_placeholders   = implode( ', ', array_fill( 0, count( $candidate_post_types ), '%s' ) );
+		$status_placeholders = implode( ', ', array_fill( 0, count( $post_status ), '%s' ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$query = $wpdb->prepare(
-			"SELECT ID, post_title, post_content
+			"SELECT ID, post_title, post_content, post_status
 			FROM {$wpdb->posts}
-			WHERE post_type IN ($placeholders)
-			AND post_status = 'publish'
+			WHERE post_type IN ($type_placeholders)
+			AND post_status IN ($status_placeholders)
 			AND post_content LIKE %s
 			ORDER BY post_title ASC",
-			array_merge( $candidate_post_types, array( $search_pattern ) )
+			array_merge( $candidate_post_types, $post_status, array( $search_pattern ) )
 		);
 
 		$posts = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
@@ -218,6 +234,7 @@ class REST_Controller extends WP_REST_Controller {
 			$results[] = array(
 				'id'              => $post->ID,
 				'title'           => $post->post_title ? $post->post_title : __( 'No title available', 'block-finder' ),
+				'status'          => $post->post_status,
 				'edit_link'       => get_edit_post_link( $post->ID, 'raw' ),
 				'view_link'       => get_permalink( $post->ID ),
 				'block_instances' => $this->find_block_instances( $post->post_content, $block ),
@@ -395,6 +412,7 @@ class REST_Controller extends WP_REST_Controller {
 						++$nested_instances;
 					}
 				}
+				$status_label = $this->get_status_label( $result['status'] ?? 'publish' );
 				?>
 				<li
 					<?php echo $has_root ? ' data-has-root="1"' : ''; ?>
@@ -418,6 +436,12 @@ class REST_Controller extends WP_REST_Controller {
 									?>
 								</span>
 							<?php endif; ?>
+							<?php if ( $status_label ) : ?>
+								<span class="block-finder-meta-sep" aria-hidden="true">|</span>
+								<span class="block-finder-meta-item block-finder-meta-status" data-status="<?php echo esc_attr( $result['status'] ); ?>">
+									<?php echo esc_html( $status_label ); ?>
+								</span>
+							<?php endif; ?>
 						</span>
 					</div>
 					<span class="block-finder-result-actions">
@@ -437,13 +461,13 @@ class REST_Controller extends WP_REST_Controller {
 				</span>
 				<span class="block-finder-page-buttons">
 					<?php if ( $page > 1 ) : ?>
-						<button type="button" class="button block-finder-prev" data-page="<?php echo esc_attr( (string) ( $page - 1 ) ); ?>">
-							<?php esc_html_e( 'Previous', 'block-finder' ); ?>
+						<button type="button" class="block-finder-page-link block-finder-prev" data-page="<?php echo esc_attr( (string) ( $page - 1 ) ); ?>">
+							<?php esc_html_e( '‹ Previous', 'block-finder' ); ?>
 						</button>
 					<?php endif; ?>
 					<?php if ( $page < $total_pages ) : ?>
-						<button type="button" class="button block-finder-next" data-page="<?php echo esc_attr( (string) ( $page + 1 ) ); ?>">
-							<?php esc_html_e( 'Next', 'block-finder' ); ?>
+						<button type="button" class="block-finder-page-link block-finder-next" data-page="<?php echo esc_attr( (string) ( $page + 1 ) ); ?>">
+							<?php esc_html_e( 'Next ›', 'block-finder' ); ?>
 						</button>
 					<?php endif; ?>
 				</span>
@@ -482,12 +506,30 @@ class REST_Controller extends WP_REST_Controller {
 	/**
 	 * Build the transient key. Post type prefix lets us invalidate per-post-type with LIKE.
 	 *
-	 * @param string $block     Block name.
-	 * @param string $post_type Post type slug or "all".
+	 * @param string   $block       Block name.
+	 * @param string   $post_type   Post type slug or "all".
+	 * @param string[] $post_status Statuses included in the search.
 	 * @return string
 	 */
-	private function get_cache_key( $block, $post_type ) {
-		return self::CACHE_PREFIX . $post_type . '_' . md5( $block );
+	private function get_cache_key( $block, $post_type, $post_status ) {
+		$statuses = $post_status;
+		sort( $statuses );
+		return self::CACHE_PREFIX . $post_type . '_' . md5( $block . '|' . implode( ',', $statuses ) );
+	}
+
+	/**
+	 * Human-readable label for a post status, or empty string for "publish" (the default).
+	 *
+	 * @param string $status Post status slug.
+	 * @return string
+	 */
+	private function get_status_label( $status ) {
+		if ( 'publish' === $status ) {
+			return '';
+		}
+
+		$obj = get_post_status_object( $status );
+		return $obj ? $obj->label : ucfirst( $status );
 	}
 
 	/**

@@ -77,6 +77,26 @@ class Dashboard {
 				<?php endforeach; ?>
 			</select>
 
+			<fieldset class="block-finder-statuses">
+				<legend><?php esc_html_e( 'Post status', 'block-finder' ); ?></legend>
+				<?php
+				$statuses = array( 'publish', 'draft', 'pending', 'future', 'private' );
+				foreach ( $statuses as $status ) :
+					$obj   = get_post_status_object( $status );
+					$label = $obj ? $obj->label : ucfirst( $status );
+					?>
+					<label class="block-finder-status-option">
+						<input
+							type="checkbox"
+							name="post_status[]"
+							value="<?php echo esc_attr( $status ); ?>"
+							<?php checked( 'publish', $status ); ?>
+						/>
+						<?php echo esc_html( $label ); ?>
+					</label>
+				<?php endforeach; ?>
+			</fieldset>
+
 			<button type="submit" class="button button-primary"><?php esc_html_e( 'Find Block', 'block-finder' ); ?></button>
 		</form>
 		<div id="block-finder-results"></div>

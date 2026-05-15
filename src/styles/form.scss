@@ -11,8 +11,36 @@
 	}
 }
 
-#block-finder-form label {
+#block-finder-form > label {
 	padding-bottom: 16px;
+}
+
+// Post-status filter group
+.block-finder-statuses {
+	border: 1px solid #c3c4c7;
+	border-radius: 3px;
+	padding: 12px 14px 14px;
+	margin: 0 0 16px;
+}
+
+.block-finder-statuses legend {
+	color: #2c3338;
+	font-size: 13px;
+	font-weight: 500;
+	padding: 0 4px;
+}
+
+.block-finder-status-option {
+	align-items: center;
+	color: #2c3338;
+	display: inline-flex;
+	font-size: 13px;
+	gap: 4px;
+	margin-right: 12px;
+}
+
+.block-finder-status-option input[type='checkbox'] {
+	margin: 0;
 }
 
 #block-finder-selector,
@@ -21,14 +49,12 @@
 	margin-bottom: 10px;
 	padding: 2px 8px;
 	width: 100%;
-	max-width: 400px;
 }
 
 // Autocomplete wrapper styles
 .autocomplete-wrapper {
 	position: relative;
 	margin-bottom: 1em;
-	max-width: 400px;
 }
 
 .autocomplete-input {
@@ -220,25 +246,22 @@
 }
 
 .block-finder-filter-link {
-	font-size: 13px;
-	color: #646970;
-	text-decoration: none;
+	color: #2271b1;
 	cursor: pointer;
-    padding: 4px 8px;
-    background-color: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 3px;
-    transition: background-color 0.15s ease, color 0.15s ease;
-    
-	&:hover, &.active {
-        color: #fff;
-        background-color: #2271b1;
-        border-color: #2271b1;
+	font-size: 13px;
+	text-decoration: none;
+
+	&:hover {
+		color: #135e96;
+		text-decoration: underline;
 	}
 
 	&.active {
+		color: #1d2327;
 		cursor: default;
+		font-weight: 600;
 		pointer-events: none;
+		text-decoration: none;
 	}
 }
 
@@ -298,6 +321,10 @@
 	color: #c3c4c7;
 }
 
+.block-finder-meta-status {
+	font-style: italic;
+}
+
 // Result actions
 .block-finder-result-actions {
 	margin-left: auto;
@@ -342,7 +369,22 @@
 	gap: 8px;
 }
 
-.block-finder-prev,
-.block-finder-next {
-	min-width: 80px;
+.block-finder-page-link {
+	background: none;
+	border: 0;
+	box-shadow: none;
+	color: #2271b1;
+	cursor: pointer;
+	font-size: 13px;
+	padding: 0;
+
+	&:hover {
+		color: #135e96;
+		text-decoration: underline;
+	}
+
+	&:focus {
+		outline: 2px solid #2271b1;
+		outline-offset: 2px;
+	}
 }
