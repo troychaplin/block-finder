@@ -2,7 +2,8 @@
 
 Contributors: areziaal
 Tags: block, search, gutenberg, tools, innerblocks
-Requires at least: 6.3
+Requires at least: 6.4
+Requires PHP: 8.0
 Tested up to: 6.9
 Stable tag: 1.0.7
 License: GPLv2 or later

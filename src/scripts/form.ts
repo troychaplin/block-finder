@@ -1,12 +1,9 @@
-/**
- * Block Finder Ajax global object interface.
- */
-interface BlockFinderAjax {
-	ajax_url: string;
-	nonce: string;
-}
+import apiFetch from '@wordpress/api-fetch';
 
-declare const blockFinderAjax: BlockFinderAjax;
+interface SearchResponse {
+	html: string;
+	total: number;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('block-finder-form') as HTMLFormElement | null;
@@ -144,8 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			showFilteredOptions();
 		});
 
-		// Focus event - show all options
+		// Focus event - clear any current selection so the full list is shown.
+		// The blur handler restores the previous value if no new pick is made.
 		autocompleteInput.addEventListener('focus', () => {
+			if (selectElement.value) {
+				autocompleteInput.value = '';
+			}
 			showFilteredOptions();
 		});
 
@@ -311,37 +312,26 @@ document.addEventListener('DOMContentLoaded', () => {
 		submitButton.textContent = 'Searching...';
 		resultsContainer.innerHTML = createLoadingSkeleton();
 
-		const data = new URLSearchParams();
-		data.append('action', 'find_blocks');
-		data.append('post_type', postType);
-		data.append('block', block);
-		data.append('page', page.toString());
-		data.append('filter', filter);
-		data.append('nonce', blockFinderAjax.nonce);
+		const params = new URLSearchParams({
+			block,
+			post_type: postType,
+			page: page.toString(),
+			filter,
+		});
 
 		try {
-			const response = await fetch(blockFinderAjax.ajax_url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-				},
-				body: data.toString(),
+			const data = await apiFetch<SearchResponse>({
+				path: `/block-finder/v1/search?${params.toString()}`,
+				method: 'GET',
 			});
+			resultsContainer.innerHTML = data.html;
 
-			if (response.ok) {
-				const responseText = await response.text();
-				resultsContainer.innerHTML = responseText;
-
-				// Attach event listeners.
-				attachPaginationListeners();
-				attachFilterListeners();
-			} else {
-				const errorData = await response.json();
-				resultsContainer.innerHTML = `<p>An error occurred: ${errorData.message}</p>`;
-			}
+			// Attach event listeners.
+			attachPaginationListeners();
+			attachFilterListeners();
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-			resultsContainer.innerHTML = `<p>An error occurred: ${errorMessage}</p>`;
+			const message = (error as { message?: string })?.message ?? 'Unknown error';
+			resultsContainer.innerHTML = `<p>An error occurred: ${message}</p>`;
 		} finally {
 			submitButton.disabled = false;
 			submitButton.textContent = 'Find Block';
