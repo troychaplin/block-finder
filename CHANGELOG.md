@@ -21,23 +21,10 @@ Prefix the change with one of these keywords:
 -   `uninstall.php` now cleans up all `block_finder_` transients from `wp_options` on plugin uninstall
 -   `Search_Service::CACHE_VERSION` constant (currently `1`) folded into the cache-key hash; bumping it in a future release naturally invalidates the entire fleet of cached entries without needing `wp transient delete --all`
 -   `@wordpress/url` added as a dev dependency; `wp-url` now listed in the compiled asset's dependency array so WordPress loads it before the dashboard script
+-   `@wordpress/components` and `@wordpress/element` added as dev dependencies; `wp-components` and `wp-element` now in the compiled asset's dependency array
 -   `REST_Controller::get_item_schema()` defines the response shape (`html`, `total`) so `OPTIONS /wp-json/block-finder/v1/search` returns a discoverable schema and the `/wp-json/` index lists it
 -   `block_finder_sources` filter in `Search_Service::search()` lets third-party code add or remove sources before the fan-out; fires on cache miss only so filtered output is cached
 -   `block_finder_results` filter in `Search_Service::search()` lets third-party code modify the assembled result set before it is cached and returned
-
-### Changed
-
--   Dashboard search URL is now built with `addQueryArgs` from `@wordpress/url` instead of `URLSearchParams`; array-typed params (`post_status`, `sources`) are serialized in the `key[]=value` format WordPress expects
-
-### Removed
-
--   Dead `function_exists( 'wp_is_block_theme' )` guard in `Dashboard::render_form()` — `wp_is_block_theme()` has been available since WP 5.9, which predates the WP 6.4 minimum
--   Dead `class_exists( WP_Block_Patterns_Registry::class )` guards in `Search_Service::search_registered_patterns()` and `Search_Service::traverse_blocks()` — available since WP 5.5
--   Dead `function_exists( 'get_block_templates' )` guard in `Search_Service::search_templates()` — available since WP 5.9
-
----
-
-
 -   REST API endpoint `GET /wp-json/block-finder/v1/search` for block search queries
 -   Per-result row showing total instances of the block in each post, and how many appear as Innerblocks
 -   Post-type-aware result heading that pluralises the type label (e.g. "Paragraph block has been found in 12 pages")
@@ -48,11 +35,12 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+-   Block and post-type selectors on the dashboard widget replaced with `<ComboboxControl>` from `@wordpress/components`; the hand-rolled `makeAutocomplete` function (~200 lines) is deleted
+-   Dashboard search URL is now built with `addQueryArgs` from `@wordpress/url` instead of `URLSearchParams`; array-typed params (`post_status`, `sources`) are serialized in the `key[]=value` format WordPress expects
 -   Restructured the dashboard form to remove redundancy: Block selector is now first, "Search in" follows, then Post type and Post status appear only when relevant. Post type shows when "Posts" is checked; Post status shows when either "Posts" or "Patterns" is checked. The submit button is disabled when no source is selected
 -   Post type defaults to "All Post Types" and is no longer required at the REST layer — searches with Patterns / Templates / Template parts as the only sources no longer fail with "post_type is required"
 -   Extracted the query + parse + cache pipeline out of `REST_Controller` into a new `Search_Service` class. No user-facing behaviour change; the REST endpoint delegates to the service via `search()`, and the `save_post` / `delete_post` / trash hooks are now owned by the service. Sets up clean entry points for the WP-CLI and templates features still pending in [FEATURES.md](FEATURES.md)
 -   Bumped minimum WordPress to 6.4 and minimum PHP to 8.0
--   Clicking an already-populated autocomplete input now clears it and shows the full list; blur restores the previous value if no pick is made
 -   Renamed "InnerBlocks (N)" filter toggle to "Innerblocks (N)"; per-row indicator renamed to "As Innerblock: N"
 -   Switched the dashboard front-end from native `fetch()` to `@wordpress/api-fetch`; WordPress core now wires the REST root URL and `X-WP-Nonce` middleware automatically
 -   Cache invalidation is now surgical: only transients for the affected post type are flushed, autosaves and revisions are skipped, and trash/untrash transitions are covered
@@ -62,6 +50,10 @@ Prefix the change with one of these keywords:
 
 ### Removed
 
+-   Hand-rolled `makeAutocomplete` function and all associated `.autocomplete-wrapper`, `.autocomplete-input`, `.autocomplete-dropdown`, and `.autocomplete-item` CSS — replaced by `<ComboboxControl>`
+-   Dead `function_exists( 'wp_is_block_theme' )` guard in `Dashboard::render_form()` — `wp_is_block_theme()` has been available since WP 5.9, which predates the WP 6.4 minimum
+-   Dead `class_exists( WP_Block_Patterns_Registry::class )` guards in `Search_Service::search_registered_patterns()` and `Search_Service::traverse_blocks()` — available since WP 5.5
+-   Dead `function_exists( 'get_block_templates' )` guard in `Search_Service::search_templates()` — available since WP 5.9
 -   Legacy `admin-ajax.php` handler in favour of the REST endpoint
 -   `Plugin_Module` abstract class
 -   Italic "Parent: X" context line under each result row (subsumed by the new Count / As Innerblock totals)
