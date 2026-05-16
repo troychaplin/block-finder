@@ -56,17 +56,32 @@ class Dashboard {
 			return;
 		}
 
+		$blocks_data = array();
+		foreach ( $inserter_blocks as $block_name => $block_type ) {
+			if ( ! empty( $block_type->title ) ) {
+				$blocks_data[] = array(
+					'value' => $block_name,
+					'label' => $block_type->title,
+				);
+			}
+		}
+
+		$post_types_data = array(
+			array(
+				'value' => 'all',
+				'label' => __( 'All Post Types', 'block-finder' ),
+			),
+		);
+		foreach ( $gutenberg_post_types as $post_type ) {
+			$post_types_data[] = array(
+				'value' => $post_type->name,
+				'label' => $post_type->label,
+			);
+		}
 		?>
 		<form id="block-finder-form">
-			<label for="block-finder-selector"><?php esc_html_e( 'Select a block you would like to search for', 'block-finder' ); ?></label>
-			<select id="block-finder-selector" name="block">
-				<option value=""><?php esc_html_e( '-- Select block --', 'block-finder' ); ?></option>
-				<?php foreach ( $inserter_blocks as $block_name => $block_type ) : ?>
-					<?php if ( ! empty( $block_type->title ) ) : ?>
-						<option value="<?php echo esc_attr( $block_name ); ?>"><?php echo esc_html( $block_type->title ); ?></option>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			</select>
+			<div id="block-finder-selector-root" data-blocks="<?php echo esc_attr( wp_json_encode( $blocks_data ) ); ?>"></div>
+			<input type="hidden" id="block-finder-selector" name="block" value="">
 
 			<fieldset class="block-finder-sources">
 				<legend><?php esc_html_e( 'Search in', 'block-finder' ); ?></legend>
@@ -94,13 +109,8 @@ class Dashboard {
 			</fieldset>
 
 			<div class="block-finder-post-type-section" data-conditional-source="posts">
-				<label for="post-type-selector"><?php esc_html_e( 'Select a post type you wish to search in', 'block-finder' ); ?></label>
-				<select id="post-type-selector" name="post_type">
-					<option value="all" selected><?php esc_html_e( 'All Post Types', 'block-finder' ); ?></option>
-					<?php foreach ( $gutenberg_post_types as $post_type ) : ?>
-						<option value="<?php echo esc_attr( $post_type->name ); ?>"><?php echo esc_html( $post_type->label ); ?></option>
-					<?php endforeach; ?>
-				</select>
+				<div id="block-finder-post-type-root" data-post-types="<?php echo esc_attr( wp_json_encode( $post_types_data ) ); ?>"></div>
+				<input type="hidden" id="post-type-selector" name="post_type" value="all">
 			</div>
 
 			<fieldset class="block-finder-statuses" data-conditional-source="posts,patterns">
