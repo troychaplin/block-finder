@@ -16,6 +16,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.1.0]
+
 ### Added
 
 -   `uninstall.php` now cleans up all `block_finder_` transients from `wp_options` on plugin uninstall

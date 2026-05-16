@@ -4,7 +4,7 @@
  * Description:       This plugin provides a dashboard to search for specific blocks
  * Requires at least: 6.4
  * Requires PHP:      8.0
- * Version:           1.0.7
+ * Version:           1.1.0
  * Author:            Troy Chaplin
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
