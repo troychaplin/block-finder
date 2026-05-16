@@ -35,6 +35,14 @@ class Search_Service {
 	const CACHE_PREFIX = 'block_finder_';
 
 	/**
+	 * Bump this when search semantics change. Old cached entries are then
+	 * naturally orphaned (different hash) and evicted by their TTL.
+	 *
+	 * @var int
+	 */
+	const CACHE_VERSION = 1;
+
+	/**
 	 * Register the cache-invalidation hooks. Call once at bootstrap.
 	 */
 	public function init() {
@@ -70,6 +78,17 @@ class Search_Service {
 		if ( false === $results ) {
 			$results = array();
 
+			/**
+			 * Filters the list of sources to search for the current request.
+			 *
+			 * Third-party code can register additional sources by hooking this and
+			 * appending custom keys, then handling them via `block_finder_results`.
+			 *
+			 * @param string[] $sources Sources to search.
+			 * @param string   $block   Block name being searched for.
+			 */
+			$sources = apply_filters( 'block_finder_sources', $sources, $block );
+
 			if ( in_array( 'posts', $sources, true ) ) {
 				$results = array_merge( $results, $this->search_posts( $block, $post_type, $post_status ) );
 			}
@@ -82,6 +101,17 @@ class Search_Service {
 			if ( in_array( 'parts', $sources, true ) ) {
 				$results = array_merge( $results, $this->search_templates( $block, 'wp_template_part' ) );
 			}
+
+			/**
+			 * Filters the assembled result set before it's cached and returned.
+			 *
+			 * @param array    $results     Result rows merged across all sources.
+			 * @param string   $block       Block name searched for.
+			 * @param string   $post_type   Post type slug or "all".
+			 * @param string[] $post_status Statuses included.
+			 * @param string[] $sources     Sources included.
+			 */
+			$results = apply_filters( 'block_finder_results', $results, $block, $post_type, $post_status, $sources );
 
 			set_transient( $cache_key, $results, self::CACHE_EXPIRATION );
 		}
@@ -334,10 +364,6 @@ class Search_Service {
 	 * @return array
 	 */
 	private function search_registered_patterns( $block ) {
-		if ( ! class_exists( WP_Block_Patterns_Registry::class ) ) {
-			return array();
-		}
-
 		$registry     = WP_Block_Patterns_Registry::get_instance();
 		$entries      = $registry->get_all_registered();
 		$patterns_url = admin_url( 'site-editor.php?path=' . rawurlencode( '/patterns' ) );
@@ -383,10 +409,6 @@ class Search_Service {
 	 * @return array
 	 */
 	private function search_templates( $block, $type ) {
-		if ( ! function_exists( 'get_block_templates' ) ) {
-			return array();
-		}
-
 		$templates    = get_block_templates( array(), $type );
 		$results      = array();
 		$source_label = 'wp_template_part' === $type ? 'part' : 'template';
@@ -481,7 +503,6 @@ class Search_Service {
 			if (
 				'core/pattern' === $block['blockName']
 				&& ! empty( $block['attrs']['slug'] )
-				&& class_exists( WP_Block_Patterns_Registry::class )
 			) {
 				$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $block['attrs']['slug'] );
 				if ( $pattern && ! empty( $pattern['content'] ) ) {
@@ -520,7 +541,7 @@ class Search_Service {
 		sort( $statuses );
 		sort( $sorted_sources );
 		return self::CACHE_PREFIX . $post_type . '_' . md5(
-			$block . '|' . implode( ',', $statuses ) . '|' . implode( ',', $sorted_sources )
+			self::CACHE_VERSION . '|' . $block . '|' . implode( ',', $statuses ) . '|' . implode( ',', $sorted_sources )
 		);
 	}
 }
