@@ -36,7 +36,7 @@ class CLI_Command {
 	 *
 	 * @var string[]
 	 */
-	private const ALLOWED_SOURCES = array( 'posts', 'reusable_blocks', 'templates', 'parts' );
+	private const ALLOWED_SOURCES = array( 'posts', 'patterns', 'templates', 'parts' );
 
 	/**
 	 * Default columns for table / CSV output.
@@ -75,7 +75,7 @@ class CLI_Command {
 	 * ---
 	 *
 	 * [--sources=<list>]
-	 * : Comma-separated sources to search. Allowed: posts, reusable_blocks, templates, parts. Templates and parts require a block theme.
+	 * : Comma-separated sources to search. Allowed: posts, patterns, templates, parts. Templates and parts require a block theme.
 	 * ---
 	 * default: posts
 	 * ---
@@ -121,8 +121,8 @@ class CLI_Command {
 	 *     # Search across drafts too
 	 *     $ wp block-finder search core/cover --post-status=publish,draft
 	 *
-	 *     # Include block-theme templates and reusable blocks in the search
-	 *     $ wp block-finder search core/heading --sources=posts,templates,parts,reusable_blocks
+	 *     # Include block-theme templates and patterns in the search
+	 *     $ wp block-finder search core/heading --sources=posts,templates,parts,patterns
 	 *
 	 * @when after_wp_load
 	 *

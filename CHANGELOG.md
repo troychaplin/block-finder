@@ -24,10 +24,12 @@ Prefix the change with one of these keywords:
 -   Locale-aware number formatting via `number_format_i18n()` so large counts render correctly (e.g. "2,345")
 -   Post-status filter on the dashboard form: searches default to Published only, but the user can include Draft, Pending, Scheduled, and Private content. Non-published results display a status badge in the meta line, and the cache key partitions by status set so searches with different status selections don't collide
 -   `wp block-finder search` WP-CLI command. Same engine as the dashboard, gated only by CLI access (no REST permission check). Supports `--post-type`, `--post-status`, `--filter=all|nested`, `--format=table|json|csv|count|ids`, `--fields`. Useful for CI checks (`--format=count`), batch operations (`--format=ids | xargs ...`), and audit exports (`--format=csv > report.csv`)
--   New "Search in" control on the dashboard form. Searches default to Posts (current behaviour), but can additionally include Reusable blocks, and — on block themes — Templates and Template parts (file-based + DB-stored). Each result row shows a source/type badge in the meta line, the result-list heading adapts to the scope ("12 templates", "5 entries" when mixed, etc.), and edit links route to the Site Editor for templates/parts. CLI mirrors via `--sources=posts,reusable_blocks,templates,parts`. Template / part / reusable-block changes flush the entire search cache (since they can appear in any cross-source search); `switch_theme` does the same to cover file-based template churn
+-   New "Search in" control on the dashboard form. Searches default to Posts (current behaviour), but can additionally include Patterns (the `wp_block` post type, renamed from "Reusable blocks" in WP 6.3) and — on block themes — Templates and Template parts (file-based + DB-stored). Each result row shows a source/type badge in the meta line, the result-list heading adapts to the scope ("12 templates", "5 entries" when mixed, etc.), and edit links route to the Site Editor for templates/parts. CLI mirrors via `--sources=posts,patterns,templates,parts`. Template / part / pattern changes flush the entire search cache (since they can appear in any cross-source search); `switch_theme` does the same to cover file-based template churn
 
 ### Changed
 
+-   Restructured the dashboard form to remove redundancy: Block selector is now first, "Search in" follows, then Post type and Post status appear only when relevant. Post type shows when "Posts" is checked; Post status shows when either "Posts" or "Patterns" is checked. The submit button is disabled when no source is selected
+-   Post type defaults to "All Post Types" and is no longer required at the REST layer — searches with Patterns / Templates / Template parts as the only sources no longer fail with "post_type is required"
 -   Extracted the query + parse + cache pipeline out of `REST_Controller` into a new `Search_Service` class. No user-facing behaviour change; the REST endpoint delegates to the service via `search()`, and the `save_post` / `delete_post` / trash hooks are now owned by the service. Sets up clean entry points for the WP-CLI and templates features still pending in [FEATURES.md](FEATURES.md)
 -   Bumped minimum WordPress to 6.4 and minimum PHP to 8.0
 -   Clicking an already-populated autocomplete input now clears it and shows the full list; blur restores the previous value if no pick is made
@@ -49,6 +51,8 @@ Prefix the change with one of these keywords:
 ### Fixed
 
 -   Guarded against a fatal error when `get_post_type_object()` returns `null` for the supplied post type slug
+-   `core/pattern` references are now resolved during search: blocks living inside theme-registered patterns (e.g. Twenty Twenty-Five's `header` template part, which is just a single `<!-- wp:pattern -->` reference) now surface when searching templates, parts, or any post content. Previously the search engine treated `core/pattern` as opaque and missed everything inside
+-   The "Patterns" source now searches both user-saved synced patterns (`wp_block` posts) AND theme/plugin-registered patterns from `WP_Block_Patterns_Registry`. Previously it only checked `wp_block` posts, so most "Patterns" searches came back empty on default installs (which usually have no synced patterns) even though the theme might have 100+ registered patterns
 
 ### Security
 

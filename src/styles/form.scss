@@ -11,8 +11,18 @@
 	}
 }
 
+.block-finder-post-type-section > label,
 #block-finder-form > label {
 	padding-bottom: 16px;
+}
+
+.block-finder-post-type-section {
+	margin: 0 0 16px;
+}
+
+// Reliable hide that beats user-agent + wp-admin fieldset styling.
+.block-finder-hidden {
+	display: none !important;
 }
 
 // Filter groups (sources + statuses share the same shape)

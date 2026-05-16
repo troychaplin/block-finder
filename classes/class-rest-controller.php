@@ -81,9 +81,9 @@ class REST_Controller extends WP_REST_Controller {
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'post_type'   => array(
-				'description'       => __( 'Post type slug, or "all" for every editor-supporting public post type.', 'block-finder' ),
+				'description'       => __( 'Post type slug, or "all" for every editor-supporting public post type. Only used when the "posts" source is included.', 'block-finder' ),
 				'type'              => 'string',
-				'required'          => true,
+				'default'           => 'all',
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'page'        => array(
@@ -112,7 +112,7 @@ class REST_Controller extends WP_REST_Controller {
 				'type'        => 'array',
 				'items'       => array(
 					'type' => 'string',
-					'enum' => array( 'posts', 'reusable_blocks', 'templates', 'parts' ),
+					'enum' => array( 'posts', 'patterns', 'templates', 'parts' ),
 				),
 				'default'     => array( 'posts' ),
 			),
@@ -388,8 +388,8 @@ class REST_Controller extends WP_REST_Controller {
 					return _n( 'template', 'templates', $count, 'block-finder' );
 				case 'parts':
 					return _n( 'template part', 'template parts', $count, 'block-finder' );
-				case 'reusable_blocks':
-					return _n( 'reusable block', 'reusable blocks', $count, 'block-finder' );
+				case 'patterns':
+					return _n( 'pattern', 'patterns', $count, 'block-finder' );
 			}
 		}
 
@@ -397,7 +397,7 @@ class REST_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Short per-result badge label ("Page", "Template", "Reusable block", etc.).
+	 * Short per-result badge label ("Page", "Template", "Pattern", etc.).
 	 *
 	 * @param array $result Single result row.
 	 * @return string
@@ -410,8 +410,8 @@ class REST_Controller extends WP_REST_Controller {
 				return __( 'Template', 'block-finder' );
 			case 'part':
 				return __( 'Template part', 'block-finder' );
-			case 'reusable_block':
-				return __( 'Reusable block', 'block-finder' );
+			case 'pattern':
+				return __( 'Pattern', 'block-finder' );
 			case 'post':
 			default:
 				$obj = get_post_type_object( $result['post_type'] ?? '' );
