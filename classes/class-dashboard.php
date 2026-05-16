@@ -58,15 +58,6 @@ class Dashboard {
 
 		?>
 		<form id="block-finder-form">
-			<label for="post-type-selector"><?php esc_html_e( 'Select a post type you wish to search in', 'block-finder' ); ?></label>
-			<select id="post-type-selector" name="post_type">
-				<option value=""><?php esc_html_e( '-- Select post type --', 'block-finder' ); ?></option>
-				<option value="all"><?php esc_html_e( 'All Post Types', 'block-finder' ); ?></option>
-				<?php foreach ( $gutenberg_post_types as $post_type ) : ?>
-					<option value="<?php echo esc_attr( $post_type->name ); ?>"><?php echo esc_html( $post_type->label ); ?></option>
-				<?php endforeach; ?>
-			</select>
-
 			<label for="block-finder-selector"><?php esc_html_e( 'Select a block you would like to search for', 'block-finder' ); ?></label>
 			<select id="block-finder-selector" name="block">
 				<option value=""><?php esc_html_e( '-- Select block --', 'block-finder' ); ?></option>
@@ -77,7 +68,42 @@ class Dashboard {
 				<?php endforeach; ?>
 			</select>
 
-			<fieldset class="block-finder-statuses">
+			<fieldset class="block-finder-sources">
+				<legend><?php esc_html_e( 'Search in', 'block-finder' ); ?></legend>
+				<?php
+				$source_options = array(
+					'posts'    => __( 'Posts', 'block-finder' ),
+					'patterns' => __( 'Patterns', 'block-finder' ),
+				);
+				if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+					$source_options['templates'] = __( 'Templates', 'block-finder' );
+					$source_options['parts']     = __( 'Template parts', 'block-finder' );
+				}
+				foreach ( $source_options as $value => $label ) :
+					?>
+					<label class="block-finder-source-option">
+						<input
+							type="checkbox"
+							name="sources[]"
+							value="<?php echo esc_attr( $value ); ?>"
+							<?php checked( 'posts', $value ); ?>
+						/>
+						<?php echo esc_html( $label ); ?>
+					</label>
+				<?php endforeach; ?>
+			</fieldset>
+
+			<div class="block-finder-post-type-section" data-conditional-source="posts">
+				<label for="post-type-selector"><?php esc_html_e( 'Select a post type you wish to search in', 'block-finder' ); ?></label>
+				<select id="post-type-selector" name="post_type">
+					<option value="all" selected><?php esc_html_e( 'All Post Types', 'block-finder' ); ?></option>
+					<?php foreach ( $gutenberg_post_types as $post_type ) : ?>
+						<option value="<?php echo esc_attr( $post_type->name ); ?>"><?php echo esc_html( $post_type->label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
+			<fieldset class="block-finder-statuses" data-conditional-source="posts,patterns">
 				<legend><?php esc_html_e( 'Post status', 'block-finder' ); ?></legend>
 				<?php
 				$statuses = array( 'publish', 'draft', 'pending', 'future', 'private' );

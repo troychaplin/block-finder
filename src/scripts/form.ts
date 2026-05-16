@@ -234,6 +234,42 @@ document.addEventListener('DOMContentLoaded', () => {
 		makeAutocomplete(blockSelector, 'Search blocks...');
 	}
 
+	// Conditional sections appear or hide based on which sources are checked.
+	const sourceCheckboxes = Array.from(
+		form.querySelectorAll<HTMLInputElement>('input[name="sources[]"]')
+	);
+	const conditionalSections = Array.from(
+		form.querySelectorAll<HTMLElement>('[data-conditional-source]')
+	);
+	const formSubmitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+	/**
+	 * Show or hide each [data-conditional-source] section based on which sources are
+	 * currently checked, and disable the submit button when no sources are selected.
+	 */
+	function updateConditionalSections(): void {
+		const checked = sourceCheckboxes.filter(cb => cb.checked).map(cb => cb.value);
+
+		for (const section of conditionalSections) {
+			const required = (section.dataset.conditionalSource ?? '')
+				.split(',')
+				.map(s => s.trim())
+				.filter(Boolean);
+			const shouldShow = required.some(r => checked.includes(r));
+			section.classList.toggle('block-finder-hidden', !shouldShow);
+		}
+
+		if (formSubmitButton) {
+			formSubmitButton.disabled = checked.length === 0;
+		}
+	}
+
+	for (const cb of sourceCheckboxes) {
+		cb.addEventListener('change', updateConditionalSections);
+	}
+
+	updateConditionalSections();
+
 	/**
 	 * Creates a loading skeleton HTML string.
 	 *
@@ -316,6 +352,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			form.querySelectorAll<HTMLInputElement>('input[name="post_status[]"]:checked')
 		).map(input => input.value);
 
+		const checkedSources = Array.from(
+			form.querySelectorAll<HTMLInputElement>('input[name="sources[]"]:checked')
+		).map(input => input.value);
+
 		const params = new URLSearchParams();
 		params.append('block', block);
 		params.append('post_type', postType);
@@ -323,6 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		params.append('filter', filter);
 		for (const status of checkedStatuses) {
 			params.append('post_status[]', status);
+		}
+		for (const source of checkedSources) {
+			params.append('sources[]', source);
 		}
 
 		try {
