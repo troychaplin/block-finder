@@ -25,6 +25,13 @@ class REST_Controller extends WP_REST_Controller {
 	const RESULTS_PER_PAGE = 10;
 
 	/**
+	 * Cached schema for response validation.
+	 *
+	 * @var array
+	 */
+	protected $schema;
+
+	/**
 	 * Search backend.
 	 *
 	 * @var Search_Service
@@ -63,8 +70,42 @@ class REST_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
+	}
+
+	/**
+	 * Response schema for the search endpoint.
+	 *
+	 * @return array
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$this->schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'block-finder-search-response',
+			'type'       => 'object',
+			'properties' => array(
+				'html'  => array(
+					'description' => __( 'Rendered HTML for the result list, ready to be inserted into the dashboard widget.', 'block-finder' ),
+					'type'        => 'string',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
+				),
+				'total' => array(
+					'description' => __( 'Total number of matches across all sources (pre-pagination).', 'block-finder' ),
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
+				),
+			),
+		);
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**

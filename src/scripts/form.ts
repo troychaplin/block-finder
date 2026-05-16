@@ -1,4 +1,5 @@
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 interface SearchResponse {
 	html: string;
@@ -356,21 +357,16 @@ document.addEventListener('DOMContentLoaded', () => {
 			form.querySelectorAll<HTMLInputElement>('input[name="sources[]"]:checked')
 		).map(input => input.value);
 
-		const params = new URLSearchParams();
-		params.append('block', block);
-		params.append('post_type', postType);
-		params.append('page', page.toString());
-		params.append('filter', filter);
-		for (const status of checkedStatuses) {
-			params.append('post_status[]', status);
-		}
-		for (const source of checkedSources) {
-			params.append('sources[]', source);
-		}
-
 		try {
 			const data = await apiFetch<SearchResponse>({
-				path: `/block-finder/v1/search?${params.toString()}`,
+				path: addQueryArgs('/block-finder/v1/search', {
+					block,
+					post_type: postType,
+					page,
+					filter,
+					post_status: checkedStatuses,
+					sources: checkedSources,
+				}),
 				method: 'GET',
 			});
 			resultsContainer.innerHTML = data.html;

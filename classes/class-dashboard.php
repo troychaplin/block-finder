@@ -75,7 +75,7 @@ class Dashboard {
 					'posts'    => __( 'Posts', 'block-finder' ),
 					'patterns' => __( 'Patterns', 'block-finder' ),
 				);
-				if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+				if ( wp_is_block_theme() ) {
 					$source_options['templates'] = __( 'Templates', 'block-finder' );
 					$source_options['parts']     = __( 'Template parts', 'block-finder' );
 				}

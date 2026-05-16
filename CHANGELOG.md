@@ -18,6 +18,26 @@ Prefix the change with one of these keywords:
 
 ### Added
 
+-   `uninstall.php` now cleans up all `block_finder_` transients from `wp_options` on plugin uninstall
+-   `Search_Service::CACHE_VERSION` constant (currently `1`) folded into the cache-key hash; bumping it in a future release naturally invalidates the entire fleet of cached entries without needing `wp transient delete --all`
+-   `@wordpress/url` added as a dev dependency; `wp-url` now listed in the compiled asset's dependency array so WordPress loads it before the dashboard script
+-   `REST_Controller::get_item_schema()` defines the response shape (`html`, `total`) so `OPTIONS /wp-json/block-finder/v1/search` returns a discoverable schema and the `/wp-json/` index lists it
+-   `block_finder_sources` filter in `Search_Service::search()` lets third-party code add or remove sources before the fan-out; fires on cache miss only so filtered output is cached
+-   `block_finder_results` filter in `Search_Service::search()` lets third-party code modify the assembled result set before it is cached and returned
+
+### Changed
+
+-   Dashboard search URL is now built with `addQueryArgs` from `@wordpress/url` instead of `URLSearchParams`; array-typed params (`post_status`, `sources`) are serialized in the `key[]=value` format WordPress expects
+
+### Removed
+
+-   Dead `function_exists( 'wp_is_block_theme' )` guard in `Dashboard::render_form()` — `wp_is_block_theme()` has been available since WP 5.9, which predates the WP 6.4 minimum
+-   Dead `class_exists( WP_Block_Patterns_Registry::class )` guards in `Search_Service::search_registered_patterns()` and `Search_Service::traverse_blocks()` — available since WP 5.5
+-   Dead `function_exists( 'get_block_templates' )` guard in `Search_Service::search_templates()` — available since WP 5.9
+
+---
+
+
 -   REST API endpoint `GET /wp-json/block-finder/v1/search` for block search queries
 -   Per-result row showing total instances of the block in each post, and how many appear as Innerblocks
 -   Post-type-aware result heading that pluralises the type label (e.g. "Paragraph block has been found in 12 pages")
