@@ -16,6 +16,12 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.1.1]
+
+### Fixed
+
+- Fixed several text strings that were not being translated
+
 ## [1.1.0]
 
 ### Added
