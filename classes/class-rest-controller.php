@@ -221,7 +221,8 @@ class REST_Controller extends WP_REST_Controller {
 	 * @return string
 	 */
 	private function render_no_results( $block, $post_type ) {
-		$block_label     = ucwords( str_replace( '-', ' ', str_replace( 'core/', '', $block ) ) );
+		$block_type      = \WP_Block_Type_Registry::get_instance()->get_registered( $block );
+		$block_label     = $block_type ? $block_type->title : ucwords( str_replace( '-', ' ', str_replace( 'core/', '', $block ) ) );
 		$post_type_label = 'all' === $post_type
 			? __( 'any post type', 'block-finder' )
 			: ( get_post_type_object( $post_type )?->labels?->name ?? $post_type );
@@ -293,7 +294,8 @@ class REST_Controller extends WP_REST_Controller {
 		$offset        = ( $page - 1 ) * self::RESULTS_PER_PAGE;
 		$paged_results = array_slice( $results, $offset, self::RESULTS_PER_PAGE );
 
-		$block_label = ucwords( str_replace( '-', ' ', str_replace( 'core/', '', $block ) ) );
+		$block_type  = \WP_Block_Type_Registry::get_instance()->get_registered( $block );
+		$block_label = $block_type ? $block_type->title : ucwords( str_replace( '-', ' ', str_replace( 'core/', '', $block ) ) );
 		$scope_label = $this->get_result_scope_label( $sources, $post_type, $total_results );
 
 		$heading = sprintf(

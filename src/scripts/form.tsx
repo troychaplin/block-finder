@@ -3,6 +3,7 @@ import { createRoot, useState } from '@wordpress/element';
 import { ComboboxControl } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
 interface SearchResponse {
 	html: string;
@@ -25,7 +26,8 @@ function BlockSelector({
 
 	return (
 		<ComboboxControl
-			label="Select a block you would like to search for"
+			label={__('Select a block you would like to search for', 'block-finder')}
+			placeholder={__('Search blocks…', 'block-finder')}
 			value={value}
 			onChange={val => {
 				setValue(val);
@@ -47,7 +49,8 @@ function PostTypeSelector({
 
 	return (
 		<ComboboxControl
-			label="Select a post type you wish to search in"
+			label={__('Select a post type you wish to search in', 'block-finder')}
+			placeholder={__('Search post types…', 'block-finder')}
 			value={value}
 			onChange={val => {
 				const next = val ?? 'all';
@@ -176,8 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		if (block === '') {
-			resultsContainer.innerHTML =
-				'<div class="block-finder-empty-state"><p>Please select a block to find.</p></div>';
+			resultsContainer.innerHTML = `<div class="block-finder-empty-state"><p>${__('Please select a block to find.', 'block-finder')}</p></div>`;
 			return;
 		}
 
@@ -194,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		// Show loading skeleton.
 		submitButton.disabled = true;
-		submitButton.textContent = 'Searching...';
+		submitButton.textContent = __('Searching…', 'block-finder');
 		resultsContainer.innerHTML = createLoadingSkeleton();
 
 		const checkedStatuses = Array.from(
@@ -223,11 +225,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			attachPaginationListeners();
 			attachFilterListeners();
 		} catch (error) {
-			const message = (error as { message?: string })?.message ?? 'Unknown error';
-			resultsContainer.innerHTML = `<p>An error occurred: ${message}</p>`;
+			const message =
+				(error as { message?: string })?.message ?? __('Unknown error', 'block-finder');
+			resultsContainer.innerHTML = `<p>${__('An error occurred:', 'block-finder')} ${message}</p>`;
 		} finally {
 			submitButton.disabled = false;
-			submitButton.textContent = 'Find Block';
+			submitButton.textContent = __('Find Block', 'block-finder');
 		}
 	}
 

@@ -69,5 +69,7 @@ class Enqueues {
 			$asset_meta['version'],
 			false
 		);
+
+		wp_set_script_translations( 'block-finder-js', 'block-finder' );
 	}
 }

@@ -22,7 +22,7 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.28",
+        "@types/react": "^18.3.28",
 		"@wordpress/api-fetch": "^7.45.0",
 		"@wordpress/components": "^33.1.0",
 		"@wordpress/element": "^6.46.0",
@@ -37,5 +37,8 @@
 		"stylelint": "^16.25.0",
 		"stylelint-scss": "^6.12.1",
 		"typescript": "^6.0.2"
+	},
+	"dependencies": {
+        "@wordpress/i18n": "^6.21.0"
 	}
 }
